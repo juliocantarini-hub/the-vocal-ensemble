@@ -51,14 +51,15 @@ function useAuthLogic() {
 
       if (error) throw error
 
-      // Si el perfil no tiene voz pero el usuario la tiene en metadata, actualizarla
-      if (!data.mail) { await supabase.from('perfiles').update({ mail: userData?.user?.email }).eq('id', userId) } if (!data.voz) {
-        const { data: userData } = await supabase.auth.getUser()
-        const vozMeta = userData?.user?.user_metadata?.voz
-        if (vozMeta) {
-          await supabase.from('perfiles').update({ voz: vozMeta }).eq('id', userId)
-          data.voz = vozMeta
-        }
+      // Si faltan datos del metadata, actualizarlos
+      const { data: authData } = await supabase.auth.getUser()
+      const meta = authData?.user?.user_metadata
+      const updates = {}
+      if (!data.voz && meta?.voz) updates.voz = meta.voz
+      if (!data.mail) updates.mail = authData?.user?.email
+      if (Object.keys(updates).length > 0) {
+        await supabase.from('perfiles').update(updates).eq('id', userId)
+        Object.assign(data, updates)
       }
 
       setPerfil(data)
