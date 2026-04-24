@@ -172,7 +172,7 @@ export default function ObraForm() {
 
       {/* ── Datos básicos ── */}
       <Seccion titulo="Información de la obra">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div style={{  display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <Campo label="Título *" error={errores.titulo}>
             <input value={form.titulo} onChange={set('titulo')} placeholder="Ave Verum Corpus" style={inputStyle} />
           </Campo>
