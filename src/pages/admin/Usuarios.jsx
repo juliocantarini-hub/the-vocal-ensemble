@@ -46,7 +46,12 @@ export default function Usuarios() {
     if (!editando) return
     setGuardando(true)
     await supabase.from('perfiles').update({
-      rol: editando.rol, voz: editando.voz, estado: editando.estado,
+      rol: editando.rol,
+      voz: editando.voz,
+      estado: editando.estado,
+      mail: editando.mail || null,
+      fecha_nacimiento: editando.fecha_nacimiento || null,
+      dni: editando.dni || null,
     }).eq('id', editando.id)
     setGuardando(false)
     setEditando(null)
@@ -68,7 +73,6 @@ export default function Usuarios() {
 
   return (
     <div>
-      {/* Cabecera */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '20px', fontWeight: 'normal', color: '#1A1A18', margin: '0 0 2px' }}>Usuarios</h2>
@@ -79,7 +83,6 @@ export default function Usuarios() {
         {mensaje && <div style={{ fontSize: '13px', color: '#04342C', background: '#E1F5EE', padding: '6px 12px', borderRadius: '8px' }}>{mensaje}</div>}
       </div>
 
-      {/* Búsqueda */}
       <div style={{ position: 'relative', marginBottom: '16px', maxWidth: '320px' }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#B4B2A9" style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)' }}>
           <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -113,6 +116,8 @@ export default function Usuarios() {
                       <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: u.estado === 'activo' ? '#639922' : '#D3D1C7', display: 'inline-block' }} />
                       {u.estado}
                     </div>
+                    {u.mail && <div style={{ fontSize: '11px', color: '#888780', marginTop: '2px' }}>{u.mail}</div>}
+                    {u.dni && <div style={{ fontSize: '11px', color: '#888780' }}>DNI: {u.dni}</div>}
                   </div>
                   <span style={{ background: rs.bg, color: rs.color, fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px', textTransform: 'capitalize' }}>
                     {u.rol}
@@ -151,7 +156,11 @@ export default function Usuarios() {
               <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 90px 80px 110px', padding: '12px 16px', alignItems: 'center', borderBottom: i < filtrados.length - 1 ? '1px solid #F1EFE8' : 'none', opacity: u.estado === 'inactivo' ? 0.6 : 1 }}>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: '500', color: '#1A1A18' }}>{u.nombre || '—'}</div>
-                  <div style={{ fontSize: '11px', color: '#888780', marginTop: '1px' }}>{u.telefono || ''}</div>
+                  <div style={{ fontSize: '11px', color: '#888780', marginTop: '1px' }}>
+                    {u.mail || u.telefono || ''}
+                    {u.dni && ` · DNI: ${u.dni}`}
+                    {u.fecha_nacimiento && ` · ${new Date(u.fecha_nacimiento).toLocaleDateString('es-AR')}`}
+                  </div>
                 </div>
                 <span style={{ fontSize: '12px', color: '#5F5E5A', textTransform: 'capitalize' }}>{u.voz || '—'}</span>
                 <span style={{ background: rs.bg, color: rs.color, fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px', textTransform: 'capitalize', display: 'inline-block' }}>{u.rol}</span>
@@ -179,10 +188,11 @@ export default function Usuarios() {
 
       {/* Modal editar */}
       {editando && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '24px' }}>
-          <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '28px', maxWidth: '400px', width: '100%', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '24px', overflowY: 'auto' }}>
+          <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '28px', maxWidth: '440px', width: '100%', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', margin: 'auto' }}>
             <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: 'normal', margin: '0 0 4px' }}>Editar usuario</h3>
-            <p style={{ fontSize: '13px', color: '#888780', margin: '0 0 20px' }}>{editando.nombre}</p>
+            <p style={{ fontSize: '13px', color: '#888780', margin: '0 0 16px' }}>{editando.nombre}</p>
+
             <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Voz</label>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -194,6 +204,7 @@ export default function Usuarios() {
                 ))}
               </div>
             </div>
+
             <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Rol</label>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -208,7 +219,8 @@ export default function Usuarios() {
                 })}
               </div>
             </div>
-            <div style={{ marginBottom: '20px' }}>
+
+            <div style={{ marginBottom: '14px' }}>
               <label style={labelStyle}>Estado</label>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {ESTADOS.map(es => (
@@ -219,7 +231,27 @@ export default function Usuarios() {
                 ))}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
+
+            <div style={{ marginBottom: '14px' }}>
+              <label style={labelStyle}>Correo electrónico</label>
+              <input value={editando.mail || ''} onChange={e => setEditando(ed => ({ ...ed, mail: e.target.value }))}
+                placeholder="correo@ejemplo.com" style={inputStyle} />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+              <div>
+                <label style={labelStyle}>DNI</label>
+                <input value={editando.dni || ''} onChange={e => setEditando(ed => ({ ...ed, dni: e.target.value }))}
+                  placeholder="12345678" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Fecha de nacimiento</label>
+                <input type="date" value={editando.fecha_nacimiento || ''} onChange={e => setEditando(ed => ({ ...ed, fecha_nacimiento: e.target.value }))}
+                  style={inputStyle} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
               <button onClick={() => setEditando(null)} style={{ flex: 1, height: '40px', borderRadius: '8px', border: '1px solid #D3D1C7', background: 'none', cursor: 'pointer', fontSize: '13px' }}>Cancelar</button>
               <button onClick={guardarEdicion} disabled={guardando} style={{ flex: 2, height: '40px', borderRadius: '8px', border: 'none', background: '#0F6E56', color: '#FFFFFF', cursor: 'pointer', fontSize: '13px', fontWeight: '500' }}>
                 {guardando ? 'Guardando...' : 'Guardar cambios'}
@@ -257,3 +289,4 @@ export default function Usuarios() {
 }
 
 const labelStyle = { display: 'block', fontSize: '12px', fontWeight: '500', color: '#5F5E5A', marginBottom: '7px', textTransform: 'uppercase', letterSpacing: '0.4px' }
+const inputStyle = { width: '100%', height: '38px', border: '1px solid #D3D1C7', borderRadius: '8px', padding: '0 12px', fontSize: '13px', color: '#1A1A18', background: '#FFFFFF', outline: 'none', boxSizing: 'border-box' }
