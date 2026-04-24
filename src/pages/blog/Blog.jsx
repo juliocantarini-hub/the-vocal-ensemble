@@ -45,20 +45,7 @@ export function Blog() {
         />
       </div>
 
-      {/* Categorías */}
-      <div style={{ display: 'flex', gap: '6px', marginBottom: '20px', flexWrap: 'wrap' }}>
-        {CATEGORIAS.map(c => (
-          <button key={c.valor} onClick={() => setCategoria(c.valor)} style={{
-            padding: '4px 12px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer',
-            border: `1px solid ${categoria === c.valor ? '#1D9E75' : '#D3D1C7'}`,
-            background: categoria === c.valor ? '#E1F5EE' : 'none',
-            color: categoria === c.valor ? '#04342C' : '#5F5E5A',
-            fontWeight: categoria === c.valor ? '500' : '400',
-          }}>
-            {c.label}
-          </button>
-        ))}
-      </div>
+
 
       {/* Error */}
       {error && (
