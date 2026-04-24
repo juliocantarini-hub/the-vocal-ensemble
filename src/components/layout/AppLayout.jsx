@@ -30,19 +30,19 @@ export default function AppLayout({ children }) {
         />
       )}
 
-      {/* Sidebar */}
-      <div style={{
-        position: 'fixed', top: 0, left: 0, bottom: 0,
-        zIndex: 50,
-        transform: esMovil && !abierto ? 'translateX(-100%)' : 'translateX(0)',
-        transition: 'transform 0.25s ease',
-      }}>
-        <Sidebar
-          seccionAdmin={false}
-          toggleAdmin={() => {}}
-          onCerrar={() => setAbierto(false)}
-        />
-      </div>
+      {/* Sidebar — en móvil solo se muestra si está abierto */}
+      {(!esMovil || abierto) && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, bottom: 0,
+          zIndex: 50,
+        }}>
+          <Sidebar
+            seccionAdmin={false}
+            toggleAdmin={() => {}}
+            onCerrar={() => setAbierto(false)}
+          />
+        </div>
+      )}
 
       {/* Botón hamburguesa — solo en móvil */}
       {esMovil && (
@@ -75,7 +75,7 @@ export default function AppLayout({ children }) {
         padding: esMovil ? '60px 16px 24px' : '28px 32px',
         flex: 1,
         minHeight: '100vh',
-        maxWidth: esMovil ? '100vw' : '900px',
+        width: esMovil ? '100%' : 'auto',
       }}>
         {children}
       </main>
