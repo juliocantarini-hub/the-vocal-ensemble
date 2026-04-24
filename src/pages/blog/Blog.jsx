@@ -40,7 +40,7 @@ export function Blog() {
         <input
           type="text" value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
-          placeholder="Buscar artículos..."
+          placeholder="Buscar textos..."
           style={{ width: '100%', height: '38px', border: '1px solid #D3D1C7', borderRadius: '8px', padding: '0 12px 0 32px', fontSize: '13px', background: '#FFFFFF', color: '#1A1A18', outline: 'none', boxSizing: 'border-box' }}
         />
       </div>
