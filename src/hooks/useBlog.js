@@ -121,12 +121,12 @@ export async function eliminarArticulo(id) {
 
 // ─── Categorías ───────────────────────────────────────────────────────────────
 export const CATEGORIAS = [
-  { valor: '',          label: 'Todas' },
+  { valor: '', label: 'Todos' },
   { valor: 'tecnica',   label: 'Técnica vocal' },
-  { valor: 'estudio',   label: 'Estudio' },
-  { valor: 'noticias',  label: 'Noticias' },
-  { valor: 'formacion', label: 'Formación' },
-  { valor: 'avisos',    label: 'Avisos institucionales' },
+  { valor: 'tecnica', label: 'Textos' },
+  { valor: 'noticias', label: 'Fonética' },
+  { valor: 'formacion', label: 'Otros' },
+  { valor: 'avisos', label: 'Avisos' },
 ]
 
 export const CATEGORIA_COLOR = {

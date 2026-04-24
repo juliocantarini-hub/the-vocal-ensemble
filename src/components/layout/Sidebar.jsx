@@ -7,7 +7,7 @@ const NAV_CANTANTE = [
   { ruta: '/repertorio', label: 'Repertorio', icono: 'musica' },
   { ruta: '/calendario', label: 'Calendario', icono: 'calendario' },
   { ruta: '/avisos',     label: 'Avisos',     icono: 'campana', badge: true },
-  { ruta: '/blog',       label: 'Blog coral', icono: 'blog' },
+  { ruta: '/blog',       label: 'Texto', icono: 'blog' },
   { ruta: '/perfil',     label: 'Mi perfil',  icono: 'perfil' },
 ]
 
@@ -16,7 +16,7 @@ const NAV_ADMIN = [
   { ruta: '/admin/obras',    label: 'Obras',     icono: 'musica' },
   { ruta: '/admin/eventos',  label: 'Eventos',   icono: 'calendario' },
   { ruta: '/admin/avisos',   label: 'Avisos',    icono: 'campana' },
-  { ruta: '/admin/blog',     label: 'Blog',      icono: 'blog' },
+  { ruta: '/admin/blog',     label: 'Texto',      icono: 'blog' },
   { ruta: '/admin/usuarios', label: 'Usuarios',  icono: 'usuarios' },
 ]
 

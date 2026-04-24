@@ -24,10 +24,10 @@ export function Blog() {
       {/* Cabecera */}
       <div style={{ marginBottom: '20px' }}>
         <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: 'normal', color: '#1A1A18', margin: '0 0 4px' }}>
-          Recurso coral
+          Textos
         </h2>
         <p style={{ fontSize: '13px', color: '#888780', margin: 0 }}>
-          Técnica, formación y noticias del coro
+          Textos, traducciones y fonética de las obras
         </p>
       </div>
 
