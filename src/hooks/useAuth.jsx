@@ -52,7 +52,7 @@ function useAuthLogic() {
       if (error) throw error
 
       // Si el perfil no tiene voz pero el usuario la tiene en metadata, actualizarla
-      if (!data.voz) {
+      if (!data.mail) { await supabase.from('perfiles').update({ mail: userData?.user?.email }).eq('id', userId) } if (!data.voz) {
         const { data: userData } = await supabase.auth.getUser()
         const vozMeta = userData?.user?.user_metadata?.voz
         if (vozMeta) {
@@ -94,13 +94,13 @@ function useAuthLogic() {
     if (error) setError(traducirError(error.message))
   }
 
-  async function registro(email, password, nombre, voz) {
+  async function registro(email, password, nombre, voz, fecha_nacimiento, dni) {
     setError(null)
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
       options: {
-        data: { full_name: nombre.trim(), voz: voz || null },
+        data: { full_name: nombre.trim(), voz: voz || null, fecha_nacimiento: fecha_nacimiento || null, dni: dni || null },
         emailRedirectTo: `${window.location.origin}/`,
       },
     })

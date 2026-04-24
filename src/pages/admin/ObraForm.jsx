@@ -139,7 +139,7 @@ export default function ObraForm() {
   }
 
   return (
-    <div style={{ maxWidth: '680px', width: '100%', boxSizing: 'border-box', width: '100%', boxSizing: 'border-box', width: '100%', boxSizing: 'border-box' }}>
+    <div style={{ maxWidth: '680px', width: '100%', boxSizing: 'border-box' }}>
       {/* Cabecera */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <button onClick={() => navigate('/admin/obras')}
