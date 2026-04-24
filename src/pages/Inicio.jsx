@@ -74,7 +74,7 @@ export default function Inicio() {
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : '1fr 1fr', gap: '16px' }}>
         {/* Obras para estudiar */}
         <Seccion titulo="Estudia esta semana" linkLabel="Ver todo" onLink={() => navigate('/repertorio')}>
           {obrasEstudio.length === 0 ? (
