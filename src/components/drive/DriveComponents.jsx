@@ -12,7 +12,6 @@ export function driveUrlDescarga(fileId) {
 
 export function DriveVisor({ fileId, titulo = 'Partitura' }) {
   const [estado, setEstado] = useState('cargando')
-
   if (!fileId) {
     return (
       <div style={estilos.vacio}>
@@ -20,7 +19,6 @@ export function DriveVisor({ fileId, titulo = 'Partitura' }) {
       </div>
     )
   }
-
   return (
     <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #E8E6DF' }}>
       {estado === 'cargando' && (
@@ -41,7 +39,7 @@ export function DriveVisor({ fileId, titulo = 'Partitura' }) {
       {estado === 'ok' && (
         <div style={estilos.pdfFooter}>
           <a href={driveUrlPDF(fileId)} target="_blank" rel="noopener noreferrer" style={estilos.linkBtn}>
-            Abrir en pestaña nueva ↗
+            Abrir en pestaña nueva
           </a>
           <a href={driveUrlDescarga(fileId)} target="_blank" rel="noopener noreferrer" style={{ ...estilos.linkBtn, color: '#5F5E5A' }}>
             Descargar PDF
@@ -61,7 +59,6 @@ export function AudioPlayer({ fileId, nombre, destacado = false }) {
       </div>
     )
   }
-
   return (
     <div style={{ padding: '8px 0', borderBottom: '1px solid #F1EFE8' }}>
       <div style={estilos.audioNombre(destacado)}>{nombre}</div>
@@ -72,14 +69,6 @@ export function AudioPlayer({ fileId, nombre, destacado = false }) {
         allow="autoplay"
         style={{ border: 'none', borderRadius: '8px', marginTop: '4px' }}
       />
-      
-        href={`https://drive.google.com/file/d/${fileId}/view`}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ fontSize: '11px', color: '#888780', textDecoration: 'none' }}
-      >
-        Abrir en Drive ↗
-      </a>
     </div>
   )
 }
@@ -92,7 +81,6 @@ export function ListaAudios({ obra, vozUsuario }) {
     { key: 'drive_audio_tenor',     nombre: 'Tenor',           voz: 'tenor' },
     { key: 'drive_audio_bajo',      nombre: 'Bajo',            voz: 'bajo' },
   ]
-
   const disponibles = audios.filter(a => obra[a.key])
   if (disponibles.length === 0) {
     return (
@@ -101,7 +89,6 @@ export function ListaAudios({ obra, vozUsuario }) {
       </div>
     )
   }
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       {audios.map(audio => (
