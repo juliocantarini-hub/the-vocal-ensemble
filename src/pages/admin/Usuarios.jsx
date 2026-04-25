@@ -238,7 +238,7 @@ export default function Usuarios() {
                 placeholder="correo@ejemplo.com" style={inputStyle} />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+            <div style={{ marginBottom: '14px' }}>             <label style={labelStyle}>Teléfono / Celular</label>             <input value={editando.telefono || ''} onChange={e => setEditando(ed => ({ ...ed, telefono: e.target.value }))}               placeholder="+54 11 0000-0000" style={inputStyle} />           </div>           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
               <div>
                 <label style={labelStyle}>DNI</label>
                 <input value={editando.dni || ''} onChange={e => setEditando(ed => ({ ...ed, dni: e.target.value }))}

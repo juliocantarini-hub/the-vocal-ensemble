@@ -101,7 +101,7 @@ export default function App() {
               <ConLayout><ArticuloDetalle /></ConLayout>
             </RutaProtegida>
           } />
-          <Route path="/companeros" element={           <RutaProtegida><MisCompaneros /></RutaProtegida>         } />         <Route path="/perfil" element={
+          <Route path="/companeros" element={           <RutaProtegida><ConLayout><MisCompaneros /></ConLayout></RutaProtegida>         } />         <Route path="/perfil" element={
             <RutaProtegida>
               <ConLayout><Perfil /></ConLayout>
             </RutaProtegida>
