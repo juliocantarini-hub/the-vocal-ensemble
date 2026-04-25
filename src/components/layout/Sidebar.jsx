@@ -110,7 +110,7 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
         })}
       </nav>
 
-      <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'sticky', bottom: 0, background: '#0A4A3A' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
           <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#1D9E75', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '600', color: 'white' }}>
             {iniciales}
