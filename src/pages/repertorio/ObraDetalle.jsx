@@ -121,7 +121,7 @@ export default function ObraDetalle() {
       </div>
 
       {/* Layout principal: partitura + panel lateral */}
-      <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', flexDirection: window.innerWidth <= 768 ? 'column' : 'row', gap: '14px', alignItems: 'flex-start' }}>
 
         {/* Partitura — ocupa el ancho principal */}
         <div style={{ flex: '1 1 300px', minWidth: 0 }}>
@@ -129,7 +129,7 @@ export default function ObraDetalle() {
         </div>
 
         {/* Panel lateral: audios + notas */}
-        <div style={{ width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ width: window.innerWidth <= 768 ? '100%' : '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Selector de audio */}
           {audiosDisponibles.length > 0 ? (
