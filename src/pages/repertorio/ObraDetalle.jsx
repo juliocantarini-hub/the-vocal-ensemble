@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useObra, marcarProgreso } from '../../hooks/useObras'
 import { useAuth } from '../../hooks/useAuth'
@@ -18,16 +18,26 @@ const NOMBRES_AUDIO = {
   drive_audio_bajo:      'Bajo',
 }
 
+function useEsMovil() {
+  const [esMovil, setEsMovil] = useState(window.innerWidth <= 768)
+  useEffect(() => {
+    const fn = () => setEsMovil(window.innerWidth <= 768)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return esMovil
+}
+
 export default function ObraDetalle() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { usuario, perfil } = useAuth()
   const { obra, cargando, error } = useObra(id)
+  const esMovil = useEsMovil()
   const [progreso, setProgreso] = useState(null)
   const [guardando, setGuardando] = useState(false)
   const [mensajeGuardado, setMensajeGuardado] = useState('')
   const [audioSeleccionado, setAudioSeleccionado] = useState(null)
-  const [tabNotas, setTabNotas] = useState(false)
 
   const progresoActual = progreso ?? obra?.progreso ?? 'pendiente'
 
@@ -66,20 +76,77 @@ export default function ObraDetalle() {
     )
   }
 
-  // Audios disponibles
   const audiosDisponibles = Object.entries(NOMBRES_AUDIO)
     .filter(([key]) => obra[key])
     .map(([key, nombre]) => ({ key, nombre, fileId: obra[key] }))
 
-  // Audio seleccionado o el de la voz del cantante por defecto
   const audioMostrado = audioSeleccionado
     || audiosDisponibles.find(a => a.key === `drive_audio_${perfil?.voz}`)
     || audiosDisponibles[0]
     || null
 
+  const PanelAudios = () => (
+    audiosDisponibles.length > 0 ? (
+      <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
+        <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+          Audios
+        </div>
+        <div style={{ display: 'flex', flexDirection: esMovil ? 'row' : 'column', gap: '6px', marginBottom: '12px', flexWrap: esMovil ? 'wrap' : 'nowrap' }}>
+          {audiosDisponibles.map(audio => {
+            const esVozPropia = audio.key === `drive_audio_${perfil?.voz}`
+            const seleccionado = audioMostrado?.key === audio.key
+            return (
+              <button key={audio.key} onClick={() => setAudioSeleccionado(audio)}
+                style={{
+                  padding: '7px 10px', borderRadius: '8px', fontSize: '12px',
+                  cursor: 'pointer', textAlign: 'left',
+                  border: `1.5px solid ${seleccionado ? '#0F6E56' : esVozPropia ? '#D85A30' : '#D3D1C7'}`,
+                  background: seleccionado ? '#E1F5EE' : esVozPropia ? '#FAECE7' : '#FFFFFF',
+                  color: seleccionado ? '#04342C' : esVozPropia ? '#712B13' : '#5F5E5A',
+                  fontWeight: seleccionado || esVozPropia ? '600' : '400',
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  flex: esMovil ? '0 0 auto' : 'unset',
+                }}>
+                {esVozPropia && <span style={{ fontSize: '10px' }}>★</span>}
+                {audio.nombre}
+              </button>
+            )
+          })}
+        </div>
+        {audioMostrado && (
+          <div>
+            <div style={{ fontSize: '11px', color: '#888780', marginBottom: '6px' }}>{audioMostrado.nombre}</div>
+            <iframe
+              key={audioMostrado.fileId}
+              src={`https://drive.google.com/file/d/${audioMostrado.fileId}/preview`}
+              width="100%"
+              height="80px"
+              allow="autoplay"
+              style={{ border: 'none', borderRadius: '8px' }}
+            />
+          </div>
+        )}
+      </div>
+    ) : (
+      <div style={{ background: '#F8F7F3', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px', fontSize: '13px', color: '#888780', textAlign: 'center' }}>
+        No hay audios disponibles.
+      </div>
+    )
+  )
+
+  const PanelNotas = () => obra.notas_director ? (
+    <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
+      <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+        Notas del director
+      </div>
+      <div style={{ fontSize: '12px', color: '#3D1608', lineHeight: '1.6', fontStyle: 'italic', background: '#FAECE7', borderLeft: '3px solid #D85A30', borderRadius: '0 6px 6px 0', padding: '8px 10px' }}>
+        "{obra.notas_director}"
+      </div>
+    </div>
+  ) : null
+
   return (
     <div>
-      {/* Volver */}
       <button onClick={() => navigate('/repertorio')}
         style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#888780', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', marginBottom: '16px', padding: 0 }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -100,9 +167,6 @@ export default function ObraDetalle() {
             </p>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
               <EstadoBadge estado={obra.estado} />
-              {obra.eventos?.length > 0 && (
-                <span style={{ fontSize: '12px', color: '#888780' }}>Evento: {obra.eventos[0].titulo}</span>
-              )}
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end' }}>
@@ -120,87 +184,27 @@ export default function ObraDetalle() {
         </div>
       </div>
 
-      {/* Layout principal: partitura + panel lateral */}
-      <div style={{ display: 'flex', flexDirection: window.innerWidth <= 768 ? 'column' : 'row', gap: '14px', alignItems: 'flex-start' }}>
-
-        {/* Partitura — ocupa el ancho principal */}
-        <div style={{ flex: '1 1 300px', minWidth: 0 }}>
+      {/* MÓVIL: audios arriba, partitura abajo */}
+      {esMovil && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <PanelAudios />
+          <PanelNotas />
           <DriveVisor fileId={obra.drive_partitura_id} titulo={obra.titulo} />
         </div>
+      )}
 
-        {/* Panel lateral: audios + notas */}
-        <div style={{ width: window.innerWidth <= 768 ? '100%' : '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
-          {/* Selector de audio */}
-          {audiosDisponibles.length > 0 ? (
-            <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
-              <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
-                Audios
-              </div>
-
-              {/* Botones de selección */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
-                {audiosDisponibles.map(audio => {
-                  const esVozPropia = audio.key === `drive_audio_${perfil?.voz}`
-                  const seleccionado = audioMostrado?.key === audio.key
-                  return (
-                    <button key={audio.key}
-                      onClick={() => setAudioSeleccionado(audio)}
-                      style={{
-                        padding: '7px 10px', borderRadius: '8px', fontSize: '12px',
-                        cursor: 'pointer', textAlign: 'left',
-                        border: `1.5px solid ${seleccionado ? '#0F6E56' : esVozPropia ? '#D85A30' : '#D3D1C7'}`,
-                        background: seleccionado ? '#E1F5EE' : esVozPropia ? '#FAECE7' : '#FFFFFF',
-                        color: seleccionado ? '#04342C' : esVozPropia ? '#712B13' : '#5F5E5A',
-                        fontWeight: seleccionado || esVozPropia ? '600' : '400',
-                        display: 'flex', alignItems: 'center', gap: '6px',
-                      }}>
-                      {esVozPropia && <span style={{ fontSize: '10px' }}>★</span>}
-                      {audio.nombre}
-                      {esVozPropia && <span style={{ fontSize: '10px', marginLeft: 'auto' }}>Mi voz</span>}
-                    </button>
-                  )
-                })}
-              </div>
-
-              {/* Reproductor del audio seleccionado */}
-              {audioMostrado && (
-                <div>
-                  <div style={{ fontSize: '11px', color: '#888780', marginBottom: '6px' }}>
-                    {audioMostrado.nombre}
-                  </div>
-                  <iframe
-                    key={audioMostrado.fileId}
-                    src={`https://drive.google.com/file/d/${audioMostrado.fileId}/preview`}
-                    width="100%"
-                    height="80px"
-                    allow="autoplay"
-                    style={{ border: 'none', borderRadius: '8px' }}
-                  />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div style={{ background: '#F8F7F3', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px', fontSize: '13px', color: '#888780', textAlign: 'center' }}>
-              No hay audios disponibles.
-            </div>
-          )}
-
-          {/* Notas del director */}
-          {obra.notas_director && (
-            <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
-              <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-                Notas del director
-              </div>
-              <div style={{ fontSize: '12px', color: '#3D1608', lineHeight: '1.6', fontStyle: 'italic', background: '#FAECE7', borderLeft: '3px solid #D85A30', borderRadius: '0 6px 6px 0', padding: '8px 10px' }}>
-                "{obra.notas_director}"
-              </div>
-            </div>
-          )}
-
+      {/* DESKTOP: partitura izquierda, panel derecha */}
+      {!esMovil && (
+        <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+          <div style={{ flex: '1 1 300px', minWidth: 0 }}>
+            <DriveVisor fileId={obra.drive_partitura_id} titulo={obra.titulo} />
+          </div>
+          <div style={{ width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <PanelAudios />
+            <PanelNotas />
+          </div>
         </div>
-      </div>
-
+      )}
     </div>
   )
 }
