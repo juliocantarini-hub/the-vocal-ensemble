@@ -8,14 +8,14 @@ const NAV_CANTANTE = [
   { ruta: '/calendario', label: 'Calendario', icono: 'calendario' },
   { ruta: '/avisos',     label: 'Avisos',     icono: 'campana', badge: true },
   { ruta: '/blog',       label: 'Textos', icono: 'blog' },
-  { ruta: '/companeros', label: 'Mis compañeros', icono: 'usuarios' }, { ruta: '/perfil',     label: 'Mi perfil',  icono: 'perfil' },
+  { ruta: '/asistencia',  label: 'Mi asistencia', icono: 'calendario' }, { ruta: '/companeros', label: 'Mis compañeros', icono: 'usuarios' }, { ruta: '/perfil',     label: 'Mi perfil',  icono: 'perfil' },
 ]
 
 const NAV_ADMIN = [
   { ruta: '/admin',          label: 'Dashboard', icono: 'dashboard' },
   { ruta: '/admin/obras',    label: 'Obras',     icono: 'musica' },
   { ruta: '/admin/eventos',  label: 'Eventos',   icono: 'calendario' },
-  { ruta: '/admin/avisos',   label: 'Avisos',    icono: 'campana' },
+  { ruta: '/admin/asistencia', label: 'Asistencia', icono: 'calendario' }, { ruta: '/admin/avisos',   label: 'Avisos',    icono: 'campana' },
   { ruta: '/admin/blog',     label: 'Textos',      icono: 'blog' },
   { ruta: '/admin/usuarios', label: 'Cantantes',  icono: 'usuarios' },
 ]

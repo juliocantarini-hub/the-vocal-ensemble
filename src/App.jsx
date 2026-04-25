@@ -18,7 +18,7 @@ import EventoDetalle   from './pages/calendario/EventoDetalle'
 import Avisos          from './pages/avisos/Avisos'
 import { Blog, ArticuloDetalle } from './pages/blog/Blog'
 import Perfil          from './pages/perfil/Perfil' 
-import MisCompaneros   from './pages/cantantes/MisCompaneros'
+import MisCompaneros   from './pages/cantantes/MisCompaneros' import MiAsistencia    from './pages/asistencia/MiAsistencia' import AsistenciaAdmin from './pages/admin/AsistenciaAdmin'
 
 // Admin
 import AdminDashboard  from './pages/admin/AdminDashboard'
@@ -101,7 +101,7 @@ export default function App() {
               <ConLayout><ArticuloDetalle /></ConLayout>
             </RutaProtegida>
           } />
-          <Route path="/companeros" element={           <RutaProtegida><ConLayout><MisCompaneros /></ConLayout></RutaProtegida>         } />         <Route path="/perfil" element={
+          <Route path="/asistencia" element={           <RutaProtegida><ConLayout><MiAsistencia /></ConLayout></RutaProtegida>         } />         <Route path="/companeros" element={           <RutaProtegida><ConLayout><MisCompaneros /></ConLayout></RutaProtegida>         } />         <Route path="/perfil" element={
             <RutaProtegida>
               <ConLayout><Perfil /></ConLayout>
             </RutaProtegida>
@@ -148,7 +148,7 @@ export default function App() {
               <ConLayout><EventoForm /></ConLayout>
             </RutaProtegida>
           } />
-          <Route path="/admin/avisos" element={
+          <Route path="/admin/asistencia" element={           <RutaProtegida rolesPermitidos={['admin','director']}>             <ConLayout><AsistenciaAdmin /></ConLayout>           </RutaProtegida>         } />         <Route path="/admin/avisos" element={
             <RutaProtegida rolesPermitidos={['admin', 'director']}>
               <ConLayout><AvisosAdmin /></ConLayout>
             </RutaProtegida>
