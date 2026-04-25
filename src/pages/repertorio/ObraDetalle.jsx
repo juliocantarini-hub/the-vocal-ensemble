@@ -85,66 +85,6 @@ export default function ObraDetalle() {
     || audiosDisponibles[0]
     || null
 
-  const PanelAudios = () => (
-    audiosDisponibles.length > 0 ? (
-      <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
-        <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
-          Audios
-        </div>
-        <div style={{ display: 'flex', flexDirection: esMovil ? 'row' : 'column', gap: '6px', marginBottom: '12px', flexWrap: esMovil ? 'wrap' : 'nowrap' }}>
-          {audiosDisponibles.map(audio => {
-            const esVozPropia = audio.key === `drive_audio_${perfil?.voz}`
-            const seleccionado = audioMostrado?.key === audio.key
-            return (
-              <button key={audio.key} onClick={() => setAudioSeleccionado(audio)}
-                style={{
-                  padding: '7px 10px', borderRadius: '8px', fontSize: '12px',
-                  cursor: 'pointer', textAlign: 'left',
-                  border: `1.5px solid ${seleccionado ? '#0F6E56' : esVozPropia ? '#D85A30' : '#D3D1C7'}`,
-                  background: seleccionado ? '#E1F5EE' : esVozPropia ? '#FAECE7' : '#FFFFFF',
-                  color: seleccionado ? '#04342C' : esVozPropia ? '#712B13' : '#5F5E5A',
-                  fontWeight: seleccionado || esVozPropia ? '600' : '400',
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  flex: esMovil ? '0 0 auto' : 'unset',
-                }}>
-                {esVozPropia && <span style={{ fontSize: '10px' }}>★</span>}
-                {audio.nombre}
-              </button>
-            )
-          })}
-        </div>
-        {audioMostrado && (
-          <div>
-            <div style={{ fontSize: '11px', color: '#888780', marginBottom: '6px' }}>{audioMostrado.nombre}</div>
-            <iframe
-              key={audioMostrado.fileId}
-              src={`https://drive.google.com/file/d/${audioMostrado.fileId}/preview`}
-              width="100%"
-              height="80px"
-              allow="autoplay"
-              style={{ border: 'none', borderRadius: '8px' }}
-            />
-          </div>
-        )}
-      </div>
-    ) : (
-      <div style={{ background: '#F8F7F3', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px', fontSize: '13px', color: '#888780', textAlign: 'center' }}>
-        No hay audios disponibles.
-      </div>
-    )
-  )
-
-  const PanelNotas = () => obra.notas_director ? (
-    <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
-      <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-        Notas del director
-      </div>
-      <div style={{ fontSize: '12px', color: '#3D1608', lineHeight: '1.6', fontStyle: 'italic', background: '#FAECE7', borderLeft: '3px solid #D85A30', borderRadius: '0 6px 6px 0', padding: '8px 10px' }}>
-        "{obra.notas_director}"
-      </div>
-    </div>
-  ) : null
-
   return (
     <div>
       <button onClick={() => navigate('/repertorio')}
@@ -165,9 +105,7 @@ export default function ObraDetalle() {
             <p style={{ fontSize: '14px', color: '#888780', margin: '0 0 10px' }}>
               {obra.compositor || 'Compositor desconocido'}
             </p>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <EstadoBadge estado={obra.estado} />
-            </div>
+            <EstadoBadge estado={obra.estado} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end' }}>
             <span style={{ fontSize: '11px', color: '#B4B2A9', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Mi progreso</span>
@@ -184,24 +122,120 @@ export default function ObraDetalle() {
         </div>
       </div>
 
-      {/* MÓVIL: audios arriba, partitura abajo */}
-      {esMovil && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <PanelAudios />
-          <PanelNotas />
-          <DriveVisor fileId={obra.drive_partitura_id} titulo={obra.titulo} />
+      {/* Panel de audios — arriba en móvil, a la derecha en desktop */}
+      {audiosDisponibles.length > 0 && (
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+            Audios
+          </div>
+          {/* Botones de selección — siempre horizontales */}
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            {audiosDisponibles.map(audio => {
+              const esVozPropia = audio.key === `drive_audio_${perfil?.voz}`
+              const seleccionado = audioMostrado?.key === audio.key
+              return (
+                <button key={audio.key} onClick={() => setAudioSeleccionado(audio)}
+                  style={{
+                    padding: '6px 12px', borderRadius: '8px', fontSize: '12px',
+                    cursor: 'pointer',
+                    border: `1.5px solid ${seleccionado ? '#0F6E56' : esVozPropia ? '#D85A30' : '#D3D1C7'}`,
+                    background: seleccionado ? '#E1F5EE' : esVozPropia ? '#FAECE7' : '#FFFFFF',
+                    color: seleccionado ? '#04342C' : esVozPropia ? '#712B13' : '#5F5E5A',
+                    fontWeight: seleccionado || esVozPropia ? '600' : '400',
+                    display: 'flex', alignItems: 'center', gap: '4px',
+                  }}>
+                  {esVozPropia && <span>★</span>}
+                  {audio.nombre}
+                </button>
+              )
+            })}
+          </div>
+          {/* Reproductor */}
+          {audioMostrado && (
+            <iframe
+              key={audioMostrado.fileId}
+              src={`https://drive.google.com/file/d/${audioMostrado.fileId}/preview`}
+              width="100%"
+              height="80px"
+              allow="autoplay"
+              style={{ border: 'none', borderRadius: '8px', display: 'block' }}
+            />
+          )}
         </div>
       )}
 
-      {/* DESKTOP: partitura izquierda, panel derecha */}
+      {/* Notas del director */}
+      {obra.notas_director && (
+        <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px', marginBottom: '14px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+            Notas del director
+          </div>
+          <div style={{ fontSize: '12px', color: '#3D1608', lineHeight: '1.6', fontStyle: 'italic', background: '#FAECE7', borderLeft: '3px solid #D85A30', borderRadius: '0 6px 6px 0', padding: '8px 10px' }}>
+            "{obra.notas_director}"
+          </div>
+        </div>
+      )}
+
+      {/* Partitura — siempre abajo en móvil */}
+      {esMovil && (
+        <DriveVisor fileId={obra.drive_partitura_id} titulo={obra.titulo} />
+      )}
+
+      {/* Desktop: partitura izquierda, panel derecha */}
       {!esMovil && (
         <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
           <div style={{ flex: '1 1 300px', minWidth: 0 }}>
             <DriveVisor fileId={obra.drive_partitura_id} titulo={obra.titulo} />
           </div>
           <div style={{ width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <PanelAudios />
-            <PanelNotas />
+            {audiosDisponibles.length > 0 && (
+              <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+                  Audios
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+                  {audiosDisponibles.map(audio => {
+                    const esVozPropia = audio.key === `drive_audio_${perfil?.voz}`
+                    const seleccionado = audioMostrado?.key === audio.key
+                    return (
+                      <button key={audio.key} onClick={() => setAudioSeleccionado(audio)}
+                        style={{
+                          padding: '7px 10px', borderRadius: '8px', fontSize: '12px',
+                          cursor: 'pointer', textAlign: 'left',
+                          border: `1.5px solid ${seleccionado ? '#0F6E56' : esVozPropia ? '#D85A30' : '#D3D1C7'}`,
+                          background: seleccionado ? '#E1F5EE' : esVozPropia ? '#FAECE7' : '#FFFFFF',
+                          color: seleccionado ? '#04342C' : esVozPropia ? '#712B13' : '#5F5E5A',
+                          fontWeight: seleccionado || esVozPropia ? '600' : '400',
+                          display: 'flex', alignItems: 'center', gap: '6px',
+                        }}>
+                        {esVozPropia && <span style={{ fontSize: '10px' }}>★</span>}
+                        {audio.nombre}
+                      </button>
+                    )
+                  })}
+                </div>
+                {audioMostrado && (
+                  <iframe
+                    key={audioMostrado.fileId}
+                    src={`https://drive.google.com/file/d/${audioMostrado.fileId}/preview`}
+                    width="100%"
+                    height="80px"
+                    allow="autoplay"
+                    style={{ border: 'none', borderRadius: '8px' }}
+                  />
+                )}
+              </div>
+            )}
+            {obra.notas_director && (
+              <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                  Notas del director
+                </div>
+                <div style={{ fontSize: '12px', color: '#3D1608', lineHeight: '1.6', fontStyle: 'italic', background: '#FAECE7', borderLeft: '3px solid #D85A30', borderRadius: '0 6px 6px 0', padding: '8px 10px' }}>
+                  "{obra.notas_director}"
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
