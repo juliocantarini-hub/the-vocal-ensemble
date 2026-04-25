@@ -18,7 +18,9 @@ import EventoDetalle   from './pages/calendario/EventoDetalle'
 import Avisos          from './pages/avisos/Avisos'
 import { Blog, ArticuloDetalle } from './pages/blog/Blog'
 import Perfil          from './pages/perfil/Perfil' 
-import MisCompaneros   from './pages/cantantes/MisCompaneros' import MiAsistencia    from './pages/asistencia/MiAsistencia' import AsistenciaAdmin from './pages/admin/AsistenciaAdmin'
+import MisCompaneros   from './pages/cantantes/MisCompaneros' 
+import MiAsistencia    from './pages/asistencia/MiAsistencia' 
+import AsistenciaAdmin from './pages/admin/AsistenciaAdmin'
 
 // Admin
 import AdminDashboard  from './pages/admin/AdminDashboard'
