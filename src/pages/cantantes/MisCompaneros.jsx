@@ -40,7 +40,7 @@ export default function MisCompaneros() {
     supabase
       .from('perfiles')
       .select('id, nombre, voz, telefono, fecha_nacimiento')
-      .eq('estado', 'activo')
+      .in('estado', ['activo', 'pendiente'])
       .neq('rol', 'admin')
       .order('nombre')
       .then(({ data }) => {
