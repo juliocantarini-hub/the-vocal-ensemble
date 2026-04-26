@@ -259,20 +259,6 @@ export function ArticuloForm() {
         <input value={form.titulo} onChange={set('titulo')} placeholder="Título del texto" style={inputStyle} autoFocus />
       </Campo>
 
-      <Campo label="Categoría">
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          {CATEGORIAS.filter(c => c.valor).map(c => {
-            const cc = CATEGORIA_COLOR[c.valor] || { bg: '#F1EFE8', color: '#5F5E5A' }
-            return (
-              <button key={c.valor} type="button" onClick={() => setForm(f => ({ ...f, categoria: c.valor }))}
-                style={{ padding: '5px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', border: `1.5px solid ${form.categoria === c.valor ? cc.color : '#D3D1C7'}`, background: form.categoria === c.valor ? cc.bg : '#FFFFFF', color: form.categoria === c.valor ? cc.color : '#5F5E5A', fontWeight: form.categoria === c.valor ? '500' : '400' }}>
-                {c.label}
-              </button>
-            )
-          })}
-        </div>
-      </Campo>
-
       <Campo label="PDF de Drive (opcional)">
         <input
           value={form.drive_pdf_id || ''}
