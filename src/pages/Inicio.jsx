@@ -8,7 +8,7 @@ import { useArticulos } from '../hooks/useBlog'
 
 export default function Inicio() {
   const [pwaPrompt, setPwaPrompt] = useState(null)
-  const [pwaInstalada, setPwaInstalada] = useState(false)
+  const [pwaInstalada, setPwaInstalada] = useState(   localStorage.getItem('pwa-banner-cerrado') === 'true' )
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -67,7 +67,7 @@ export default function Inicio() {
               <div style={{ fontSize: '11px', color: 'rgba(159,225,203,0.7)' }}>Accedé más rápido desde tu celular</div>
             </div>
           </div>
-          <button onClick={handleInstalar} style={{
+          <button onClick={() => {           localStorage.setItem('pwa-banner-cerrado', 'true')           setPwaInstalada(true)         }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '18px', padding: '0 4px' }}>✕</button>         <button onClick={handleInstalar} style={{
             background: '#1D9E75', color: '#FFFFFF', border: 'none',
             borderRadius: '8px', padding: '8px 14px', fontSize: '12px',
             cursor: 'pointer', fontWeight: '500', flexShrink: 0,
