@@ -6,18 +6,8 @@ const svg = `
   <!-- Fondo verde -->
   <rect width="512" height="512" rx="80" fill="#0F6E56"/>
   
-  <!-- Letra A estilizada -->
-  <text x="140" y="340" 
-    font-family="Georgia, serif" 
-    font-size="280" 
-    font-weight="bold" 
-    fill="white"
-    opacity="0.95">A</text>
-  
-  <!-- Corchea musical -->
-  <circle cx="370" cy="165" r="28" fill="#9FE1CB"/>
-  <rect x="394" y="80" width="14" height="120" fill="#9FE1CB" rx="7"/>
-  <path d="M408 80 Q450 95 440 130 Q430 150 408 145" fill="#9FE1CB"/>
+  <!-- Corchea musical grande -->
+<circle cx="220" cy="360" r="60" fill="#9FE1CB"/> <rect x="270" y="100" width="28" height="280" fill="#9FE1CB" rx="14"/> <path d="M298 100 Q420 140 400 230 Q380 300 298 280" fill="#9FE1CB"/>
 </svg>
 `
 
