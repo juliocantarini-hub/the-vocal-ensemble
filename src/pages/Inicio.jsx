@@ -11,6 +11,9 @@ export default function Inicio() {
   const [pwaInstalada, setPwaInstalada] = useState(false)
 
   useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }
     const handlerInstall = (e) => {
       e.preventDefault()
       setPwaPrompt(e)
@@ -19,7 +22,7 @@ export default function Inicio() {
       setPwaInstalada(true)
       setPwaPrompt(null)
     }
-    if ('serviceWorker' in navigator) {     navigator.serviceWorker.register('/sw.js').catch(() => {})   }   window.addEventListener('beforeinstallprompt', handlerInstall)
+    window.addEventListener('beforeinstallprompt', handlerInstall)
     window.addEventListener('appinstalled', handlerInstalled)
     return () => {
       window.removeEventListener('beforeinstallprompt', handlerInstall)
@@ -29,7 +32,6 @@ export default function Inicio() {
 
   const navigate = useNavigate()
   const { perfil } = useAuth()
-
   const { eventos } = useEventos({ soloFuturos: true })
   const { obras }   = useObras()
   const { avisos, noLeidos } = useAvisos()
@@ -40,10 +42,19 @@ export default function Inicio() {
   const avisosRecientes = avisos.slice(0, 3)
   const diasProx = proximoEvento ? diasRestantes(proximoEvento.fecha_inicio) : null
 
+  async function handleInstalar() {
+    if (pwaPrompt) {
+      await pwaPrompt.prompt()
+      setPwaPrompt(null)
+    } else {
+      alert('Para instalar: tocá los ⋮ de Chrome y elegí "Agregar a pantalla de inicio"')
+    }
+  }
+
   return (
     <div>
       {/* Botón instalar PWA */}
-      {pwaPrompt && !pwaInstalada && (
+      {!pwaInstalada && (
         <div style={{
           background: '#0A4A3A', borderRadius: '12px', padding: '12px 16px',
           marginBottom: '16px', display: 'flex', alignItems: 'center',
@@ -56,12 +67,7 @@ export default function Inicio() {
               <div style={{ fontSize: '11px', color: 'rgba(159,225,203,0.7)' }}>Accedé más rápido desde tu celular</div>
             </div>
           </div>
-          <button onClick={async () => {
-            if (pwaPrompt) {
-              await pwaPrompt.prompt()
-              setPwaPrompt(null)
-            }
-          }} style={{
+          <button onClick={handleInstalar} style={{
             background: '#1D9E75', color: '#FFFFFF', border: 'none',
             borderRadius: '8px', padding: '8px 14px', fontSize: '12px',
             cursor: 'pointer', fontWeight: '500', flexShrink: 0,
