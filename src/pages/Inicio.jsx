@@ -66,13 +66,6 @@ export default function Inicio() {
         <StatCard val={eventos.length} label="Eventos próximos" color="#378ADD" bg="#E6F1FB" onClick={() => navigate('/calendario')} />
       </div>
 
-      {/* Instrucción instalar app */}
-      <div style={{ background: '#E1F5EE', border: '1px solid #B4D8CE', borderRadius: '12px', padding: '12px 16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <span style={{ fontSize: '20px', flexShrink: 0 }}>📲</span>
-        <div style={{ fontSize: '12px', color: '#04342C', lineHeight: '1.5' }}>
-          <strong>Instalá la app:</strong> tocá los ⋮ de Chrome → "Agregar a pantalla de inicio"
-        </div>
-      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth <= 768 ? '1fr' : '1fr 1fr', gap: '16px' }}>
         <Seccion titulo="Estudia esta semana" linkLabel="Ver todo" onLink={() => navigate('/repertorio')}>

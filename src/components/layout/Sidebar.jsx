@@ -133,10 +133,10 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
               ✕
             </button>
             <div style={{ fontSize: '11px', color: '#FFFFFF', fontWeight: '600', marginBottom: '5px' }}>
-              📲 Instalá la app
+              📲 Acceso directo
             </div>
             <div style={{ fontSize: '11px', color: 'rgba(159,225,203,0.85)', lineHeight: '1.6' }}>
-              Tocá los <strong style={{ color: '#FFFFFF' }}>⋮</strong> de Chrome y elegí <strong style={{ color: '#FFFFFF' }}>"Agregar a pantalla de inicio"</strong>
+              Para agregar un acceso directo a la app en tu pantalla de inicio, tocá los <strong style={{ color: '#FFFFFF' }}>⋮</strong> de Chrome y elegí <strong style={{ color: '#FFFFFF' }}>"Agregar a pantalla de inicio"</strong>>
             </div>
           </div>
         )}
