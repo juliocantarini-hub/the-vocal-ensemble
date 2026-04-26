@@ -46,15 +46,26 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
     ? perfil.nombre.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
     : '?'
 
-  function isActive(ruta) {
-    if (ruta === '/') return location.pathname === '/'
-    return location.pathname.startsWith(ruta)
+  function isActive(ruta, esMenuAdmin) {
+    if (esMenuAdmin) {
+      // En modo admin solo activamos rutas /admin/...
+      if (ruta === '/admin') return location.pathname === '/admin'
+      return location.pathname.startsWith(ruta)
+    } else {
+      // En modo cantante solo activamos rutas que NO sean /admin/...
+      if (location.pathname.startsWith('/admin')) return false
+      if (ruta === '/') return location.pathname === '/'
+      return location.pathname.startsWith(ruta)
+    }
   }
 
   function handleNavegar(ruta) {
     navigate(ruta)
     if (onNavegar) onNavegar()
   }
+
+  const esMenuAdmin = seccionAdmin && (esAdmin || esDirector)
+  const navItems = esMenuAdmin ? NAV_ADMIN : NAV_CANTANTE
 
   return (
     <div style={{ width: '210px', minHeight: '100vh', background: '#0A4A3A', display: 'flex', flexDirection: 'column' }}>
@@ -92,8 +103,8 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
 
       {/* Nav */}
       <nav style={{ flex: 1, padding: '10px 0', overflowY: 'auto' }}>
-        {(seccionAdmin && (esAdmin || esDirector) ? NAV_ADMIN : NAV_CANTANTE).map(item => {
-          const activo = isActive(item.ruta)
+        {navItems.map(item => {
+          const activo = isActive(item.ruta, esMenuAdmin)
           return (
             <button key={item.ruta} onClick={() => handleNavegar(item.ruta)}
               style={{
@@ -121,13 +132,9 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
       {/* Footer */}
       <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'sticky', bottom: 0, background: '#0A4A3A' }}>
 
-        {/* Popup ayuda instalar */}
+        {/* Popup ayuda */}
         {mostrarAyuda && (
-          <div style={{
-            background: '#0F6E56', borderRadius: '10px', padding: '12px 14px',
-            marginBottom: '10px', position: 'relative',
-            border: '1px solid rgba(255,255,255,0.15)',
-          }}>
+          <div style={{ background: '#0F6E56', borderRadius: '10px', padding: '12px 14px', marginBottom: '10px', position: 'relative', border: '1px solid rgba(255,255,255,0.15)' }}>
             <button onClick={() => setMostrarAyuda(false)}
               style={{ position: 'absolute', top: '6px', right: '8px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}>
               ✕
@@ -136,7 +143,7 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
               📲 Acceso directo
             </div>
             <div style={{ fontSize: '11px', color: 'rgba(159,225,203,0.85)', lineHeight: '1.6' }}>
-              Para agregar un acceso directo a la app en tu pantalla de inicio, tocá los <strong style={{ color: '#FFFFFF' }}>⋮</strong> de Chrome y elegí <strong style={{ color: '#FFFFFF' }}>"Agregar a pantalla de inicio"</strong>>
+              Para agregar un acceso directo a la app en tu pantalla de inicio, tocá los <strong style={{ color: '#FFFFFF' }}>⋮</strong> de Chrome y elegí <strong style={{ color: '#FFFFFF' }}>"Agregar a pantalla de inicio"</strong>
             </div>
           </div>
         )}
@@ -154,16 +161,8 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
               {perfil?.voz || perfil?.rol || '—'}
             </div>
           </div>
-          {/* Botón ? */}
           <button onClick={() => setMostrarAyuda(v => !v)}
-            style={{
-              width: '24px', height: '24px', borderRadius: '50%',
-              background: mostrarAyuda ? '#1D9E75' : 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: 'rgba(255,255,255,0.7)', cursor: 'pointer',
-              fontSize: '12px', fontWeight: '600', flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
+            style={{ width: '24px', height: '24px', borderRadius: '50%', background: mostrarAyuda ? '#1D9E75' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '12px', fontWeight: '600', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             ?
           </button>
         </div>
