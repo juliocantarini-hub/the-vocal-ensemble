@@ -5,17 +5,19 @@ import { useAuth } from '../../hooks/useAuth'
 
 const ESTADOS = [
   { valor: '',          label: 'Todas' },
+  { valor: 'concierto', label: 'Próximo concierto' },
   { valor: 'estudio',   label: 'En estudio' },
   { valor: 'activo',    label: 'Activo' },
-  { valor: 'concierto', label: 'Próximo concierto' },
 ]
 
 const BADGE = {
   estudio:   { bg: '#E1F5EE', color: '#04342C', txt: 'En estudio' },
   activo:    { bg: '#EAF3DE', color: '#27500A', txt: 'Activo' },
-  concierto: { bg: '#FAECE7', color: '#712B13', txt: 'Concierto' },
+  concierto: { bg: '#FAECE7', color: '#712B13', txt: 'Próximo concierto' },
   archivado: { bg: '#F1EFE8', color: '#888780', txt: 'Archivado' },
 }
+
+const ORDEN_ESTADO = { concierto: 0, activo: 1, estudio: 2, archivado: 3 }
 
 function Badge({ estado }) {
   const b = BADGE[estado] || BADGE.archivado
@@ -59,13 +61,22 @@ export default function Repertorio() {
   })
 
   const obrasFiltradas = useMemo(() => {
-    if (!vozFiltro || !perfil?.voz) return obras
-    return obras.filter(o => o[`drive_audio_${perfil.voz}`])
+    let lista = vozFiltro && perfil?.voz
+      ? obras.filter(o => o[`drive_audio_${perfil.voz}`])
+      : obras
+
+    // Ordenar: Próximo concierto primero
+    lista = [...lista].sort((a, b) => {
+      const oa = ORDEN_ESTADO[a.estado] ?? 99
+      const ob = ORDEN_ESTADO[b.estado] ?? 99
+      return oa - ob
+    })
+
+    return lista
   }, [obras, vozFiltro, perfil?.voz])
 
   return (
     <div>
-      {/* Cabecera */}
       <div style={{ marginBottom: '20px' }}>
         <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '22px', fontWeight: 'normal', color: '#1A1A18', margin: '0 0 4px' }}>
           Repertorio
@@ -75,34 +86,21 @@ export default function Repertorio() {
         </p>
       </div>
 
-      {/* Búsqueda + filtros */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: '1', minWidth: '200px' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#B4B2A9"
             style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)' }}>
             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
           </svg>
-          <input
-            type="text"
-            placeholder="Buscar por título o compositor..."
-            value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
-            style={{
-              width: '100%', height: '36px',
-              border: '1px solid #D3D1C7', borderRadius: '8px',
-              padding: '0 12px 0 32px', fontSize: '13px',
-              background: '#FFFFFF', color: '#1A1A18', outline: 'none',
-            }}
-          />
+          <input type="text" placeholder="Buscar por título o compositor..."
+            value={busqueda} onChange={e => setBusqueda(e.target.value)}
+            style={{ width: '100%', height: '36px', border: '1px solid #D3D1C7', borderRadius: '8px', padding: '0 12px 0 32px', fontSize: '13px', background: '#FFFFFF', color: '#1A1A18', outline: 'none' }} />
         </div>
       </div>
 
-      {/* Chips de filtro */}
       <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
         {ESTADOS.map(e => (
-          <button
-            key={e.valor}
-            onClick={() => setEstadoFiltro(e.valor)}
+          <button key={e.valor} onClick={() => setEstadoFiltro(e.valor)}
             style={{
               padding: '4px 12px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer',
               border: `1px solid ${estadoFiltro === e.valor ? '#1D9E75' : '#D3D1C7'}`,
@@ -110,28 +108,24 @@ export default function Repertorio() {
               color: estadoFiltro === e.valor ? '#04342C' : '#5F5E5A',
               fontWeight: estadoFiltro === e.valor ? '500' : '400',
               transition: 'all 0.12s',
-            }}
-          >
+            }}>
             {e.label}
           </button>
         ))}
         {perfil?.voz && (
-          <button
-            onClick={() => setVozFiltro(v => !v)}
+          <button onClick={() => setVozFiltro(v => !v)}
             style={{
               padding: '4px 12px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer',
               border: `1px solid ${vozFiltro ? '#D85A30' : '#D3D1C7'}`,
               background: vozFiltro ? '#FAECE7' : 'none',
               color: vozFiltro ? '#712B13' : '#5F5E5A',
               fontWeight: vozFiltro ? '500' : '400',
-            }}
-          >
+            }}>
             Solo mi voz ({perfil.voz})
           </button>
         )}
       </div>
 
-      {/* Estados */}
       {error && (
         <div style={{ background: '#FCEBEB', border: '1px solid #E24B4A', borderRadius: '8px', padding: '12px 14px', fontSize: '13px', color: '#501313', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {error}
@@ -161,39 +155,29 @@ export default function Repertorio() {
         </div>
       )}
 
-      {/* Lista de obras */}
       {!cargando && !error && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {obrasFiltradas.map(obra => (
-            <div
-              key={obra.id}
-              onClick={() => navigate(`/repertorio/${obra.id}`)}
+            <div key={obra.id} onClick={() => navigate(`/repertorio/${obra.id}`)}
               style={{
-                background: '#FFFFFF', border: '1px solid #E8E6DF',
+                background: '#FFFFFF',
+                border: obra.estado === 'concierto' ? '1px solid #F0C5B4' : '1px solid #E8E6DF',
+                borderLeft: obra.estado === 'concierto' ? '3px solid #D85A30' : '1px solid #E8E6DF',
                 borderRadius: '10px', padding: '14px 16px',
                 display: 'flex', alignItems: 'center', gap: '14px',
                 cursor: 'pointer', transition: 'border-color 0.12s, box-shadow 0.12s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#B4D8CE'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8E6DF'; e.currentTarget.style.boxShadow = 'none' }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)' }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none' }}
             >
-              {/* Icono */}
-              <div style={{
-                width: '42px', height: '42px', borderRadius: '8px',
-                background: '#F1EFE8', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', flexShrink: 0,
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1D9E75">
+              <div style={{ width: '42px', height: '42px', borderRadius: '8px', background: obra.estado === 'concierto' ? '#FAECE7' : '#F1EFE8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={obra.estado === 'concierto' ? '#D85A30' : '#1D9E75'}>
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                 </svg>
               </div>
-
-              {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A18' }}>
-                    {obra.titulo}
-                  </span>
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A18' }}>{obra.titulo}</span>
                   <Badge estado={obra.estado} />
                   {obra.progreso === 'estudiada' && (
                     <span style={{ fontSize: '10px', color: '#639922', fontWeight: '600' }}>✓ Estudiada</span>
@@ -210,8 +194,6 @@ export default function Repertorio() {
                   </span>
                 </div>
               </div>
-
-              {/* Flecha */}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#D3D1C7" style={{ flexShrink: 0 }}>
                 <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
               </svg>
