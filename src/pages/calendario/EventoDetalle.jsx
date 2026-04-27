@@ -109,7 +109,8 @@ export default function EventoDetalle() {
               </span>
               {evento.lugar && (
                 
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(evento.lugar)}`}
+                <a 
+                  href={'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(evento.direccion || evento.lugar)}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: '#0F6E56', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
