@@ -11,7 +11,6 @@ const FILTROS = [
   { valor: 'material', label: 'Material' },
   { valor: 'horario',  label: 'Horarios' },
   { valor: 'evento',   label: 'Eventos' },
-  { valor: 'blog',     label: 'Blog' },
   { valor: 'urgente',  label: 'Urgente' },
 ]
 
