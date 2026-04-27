@@ -130,6 +130,5 @@ export const TIPO_AVISO = {
   material: { label: 'Nuevo material', bg: '#E1F5EE', color: '#04342C', dot: '#1D9E75' },
   horario:  { label: 'Cambio de horario', bg: '#FAECE7', color: '#712B13', dot: '#D85A30' },
   evento:   { label: 'Evento', bg: '#E6F1FB', color: '#042C53', dot: '#378ADD' },
-  blog:     { label: 'Blog coral', bg: '#F3EFF8', color: '#3D1C6E', dot: '#7C3AED' },
   urgente:  { label: 'Urgente', bg: '#FCEBEB', color: '#501313', dot: '#E24B4A' },
 }
