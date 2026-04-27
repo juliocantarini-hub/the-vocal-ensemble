@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
 import { useObrasAdmin, publicarObra, eliminarObra } from '../../hooks/useObras'
 
 const BADGE = {
   estudio:   { bg: '#E1F5EE', color: '#04342C', txt: 'En estudio' },
   activo:    { bg: '#EAF3DE', color: '#27500A', txt: 'Activo' },
-  concierto: { bg: '#FAECE7', color: '#712B13', txt: 'Próximo Concierto' },
+  concierto: { bg: '#FAECE7', color: '#712B13', txt: 'Próximo concierto' },
   archivado: { bg: '#F1EFE8', color: '#888780', txt: 'Archivado' },
 }
 
@@ -47,9 +48,26 @@ export default function ObrasLista() {
     setProcesando(null)
   }
 
+  async function moverObra(obra, direccion) {
+    const lista = [...obrasFiltradas]
+    const idx = lista.findIndex(o => o.id === obra.id)
+    const nuevoIdx = idx + direccion
+    if (nuevoIdx < 0 || nuevoIdx >= lista.length) return
+
+    const obraA = lista[idx]
+    const obraB = lista[nuevoIdx]
+    const ordenA = obraA.orden ?? idx
+    const ordenB = obraB.orden ?? nuevoIdx
+
+    setProcesando(obra.id)
+    await supabase.from('obras').update({ orden: ordenB }).eq('id', obraA.id)
+    await supabase.from('obras').update({ orden: ordenA }).eq('id', obraB.id)
+    await recargar()
+    setProcesando(null)
+  }
+
   return (
     <div>
-      {/* Cabecera */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '20px', fontWeight: 'normal', color: '#1A1A18', margin: '0 0 2px' }}>
@@ -66,7 +84,6 @@ export default function ObrasLista() {
         </button>
       </div>
 
-      {/* Búsqueda */}
       <div style={{ position: 'relative', marginBottom: '16px', maxWidth: '320px' }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#B4B2A9"
           style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)' }}>
@@ -98,7 +115,7 @@ export default function ObrasLista() {
               {busqueda ? 'No hay obras que coincidan.' : 'Aún no hay obras.'}
             </div>
           )}
-          {obrasFiltradas.map(obra => {
+          {obrasFiltradas.map((obra, i) => {
             const badge = BADGE[obra.estado] || BADGE.archivado
             const mats = contarMateriales(obra)
             return (
@@ -113,27 +130,27 @@ export default function ObrasLista() {
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '12px', color: mats > 0 ? '#0F6E56' : '#B4B2A9' }}>
-                      {mats}/6 archivos
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '12px', color: mats > 0 ? '#0F6E56' : '#B4B2A9' }}>{mats}/6</span>
                     <button onClick={() => togglePublicar(obra)} disabled={!!procesando}
                       style={{ width: '44px', height: '24px', borderRadius: '12px', border: 'none', cursor: 'pointer', background: obra.publicada ? '#0F6E56' : '#D3D1C7', position: 'relative', transition: 'background 0.2s' }}>
                       <span style={{ position: 'absolute', top: '3px', left: obra.publicada ? '22px' : '3px', width: '18px', height: '18px', borderRadius: '50%', background: '#FFFFFF', transition: 'left 0.2s' }} />
                     </button>
                     <span style={{ fontSize: '11px', color: obra.publicada ? '#27500A' : '#888780' }}>
-                      {obra.publicada ? 'Publicada' : 'Borrador'}
+                      {obra.publicada ? 'Pub.' : 'Bor.'}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button onClick={() => moverObra(obra, -1)} disabled={i === 0 || !!procesando}
+                      style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #D3D1C7', background: 'none', cursor: i === 0 ? 'not-allowed' : 'pointer', color: '#888780', opacity: i === 0 ? 0.3 : 1, fontSize: '14px' }}>↑</button>
+                    <button onClick={() => moverObra(obra, 1)} disabled={i === obrasFiltradas.length - 1 || !!procesando}
+                      style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid #D3D1C7', background: 'none', cursor: i === obrasFiltradas.length - 1 ? 'not-allowed' : 'pointer', color: '#888780', opacity: i === obrasFiltradas.length - 1 ? 0.3 : 1, fontSize: '14px' }}>↓</button>
                     <button onClick={() => navigate(`/admin/obras/${obra.id}`)}
-                      style={{ padding: '5px 12px', fontSize: '12px', borderRadius: '6px', border: '1px solid #D3D1C7', background: 'none', cursor: 'pointer', color: '#0F6E56', fontWeight: '500' }}>
+                      style={{ padding: '5px 10px', fontSize: '12px', borderRadius: '6px', border: '1px solid #D3D1C7', background: 'none', cursor: 'pointer', color: '#0F6E56', fontWeight: '500' }}>
                       Editar
                     </button>
                     <button onClick={() => setConfirmEliminar(obra)}
-                      style={{ padding: '5px 8px', fontSize: '12px', borderRadius: '6px', border: '1px solid #F0C5B4', background: 'none', cursor: 'pointer', color: '#A32D2D' }}>
-                      ✕
-                    </button>
+                      style={{ padding: '5px 8px', fontSize: '12px', borderRadius: '6px', border: '1px solid #F0C5B4', background: 'none', cursor: 'pointer', color: '#A32D2D' }}>✕</button>
                   </div>
                 </div>
               </div>
@@ -145,9 +162,9 @@ export default function ObrasLista() {
       {/* DESKTOP: tabla */}
       {!cargando && !esMovil && (
         <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 80px 100px 100px', gap: '0', padding: '10px 16px', background: '#F8F7F3', borderBottom: '1px solid #E8E6DF', fontSize: '11px', fontWeight: '600', color: '#888780', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-            <span>Obra</span><span>Estado</span><span style={{ textAlign: 'center' }}>Archivos</span>
-            <span style={{ textAlign: 'center' }}>Publicada</span>
+          <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 130px 80px 100px 120px', padding: '10px 16px', background: '#F8F7F3', borderBottom: '1px solid #E8E6DF', fontSize: '11px', fontWeight: '600', color: '#888780', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+            <span>Ord.</span><span>Obra</span><span>Estado</span><span style={{ textAlign: 'center' }}>Arch.</span>
+            <span style={{ textAlign: 'center' }}>Pub.</span>
             <span style={{ textAlign: 'right' }}>Acciones</span>
           </div>
           {obrasFiltradas.length === 0 && (
@@ -160,7 +177,13 @@ export default function ObrasLista() {
             const mats = contarMateriales(obra)
             const esUltima = i === obrasFiltradas.length - 1
             return (
-              <div key={obra.id} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 80px 100px 100px', gap: '0', padding: '12px 16px', alignItems: 'center', borderBottom: esUltima ? 'none' : '1px solid #F1EFE8', opacity: procesando === obra.id ? 0.5 : 1 }}>
+              <div key={obra.id} style={{ display: 'grid', gridTemplateColumns: '40px 1fr 130px 80px 100px 120px', padding: '12px 16px', alignItems: 'center', borderBottom: esUltima ? 'none' : '1px solid #F1EFE8', opacity: procesando === obra.id ? 0.5 : 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <button onClick={() => moverObra(obra, -1)} disabled={i === 0 || !!procesando}
+                    style={{ width: '24px', height: '20px', borderRadius: '4px', border: '1px solid #D3D1C7', background: 'none', cursor: i === 0 ? 'not-allowed' : 'pointer', color: '#888780', opacity: i === 0 ? 0.3 : 1, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↑</button>
+                  <button onClick={() => moverObra(obra, 1)} disabled={esUltima || !!procesando}
+                    style={{ width: '24px', height: '20px', borderRadius: '4px', border: '1px solid #D3D1C7', background: 'none', cursor: esUltima ? 'not-allowed' : 'pointer', color: '#888780', opacity: esUltima ? 0.3 : 1, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>↓</button>
+                </div>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: '500', color: '#1A1A18' }}>{obra.titulo}</div>
                   <div style={{ fontSize: '11px', color: '#888780', marginTop: '2px' }}>{obra.compositor || '—'}</div>
@@ -183,9 +206,7 @@ export default function ObrasLista() {
                     Editar
                   </button>
                   <button onClick={() => setConfirmEliminar(obra)}
-                    style={{ padding: '4px 8px', fontSize: '12px', borderRadius: '6px', border: '1px solid #F0C5B4', background: 'none', cursor: 'pointer', color: '#A32D2D' }}>
-                    ✕
-                  </button>
+                    style={{ padding: '4px 8px', fontSize: '12px', borderRadius: '6px', border: '1px solid #F0C5B4', background: 'none', cursor: 'pointer', color: '#A32D2D' }}>✕</button>
                 </div>
               </div>
             )
@@ -193,7 +214,6 @@ export default function ObrasLista() {
         </div>
       )}
 
-      {/* Modal eliminar */}
       {confirmEliminar && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '24px' }}>
           <div style={{ background: '#FFFFFF', borderRadius: '14px', padding: '28px 24px', maxWidth: '360px', width: '100%', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>

@@ -20,7 +20,7 @@ export function useObras(filtros = {}) {
           progreso_estudio!left(estado)
         `)
         .eq('publicada', true)
-        .order('titulo')
+        .order('orden', { ascending: true }).order('titulo')
 
       if (filtros.estado)  query = query.eq('estado', filtros.estado)
       if (filtros.busqueda) {
