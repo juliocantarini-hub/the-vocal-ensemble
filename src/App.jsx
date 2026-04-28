@@ -31,6 +31,7 @@ import EventosLista    from './pages/admin/EventosLista'
 import EventoForm      from './pages/admin/EventoForm'
 import { AvisosAdmin } from './pages/admin/AvisosAdmin'
 import { ArticulosAdmin, ArticuloForm } from './pages/admin/ArticulosAdmin'
+import EstudioAdmin    from './pages/admin/EstudioAdmin'
 
 // Ruta pública: redirige al inicio si ya hay sesión
 function RutaPublica({ children }) {
@@ -103,7 +104,13 @@ export default function App() {
               <ConLayout><ArticuloDetalle /></ConLayout>
             </RutaProtegida>
           } />
-          <Route path="/asistencia" element={           <RutaProtegida><ConLayout><MiAsistencia /></ConLayout></RutaProtegida>         } />         <Route path="/companeros" element={           <RutaProtegida><ConLayout><MisCompaneros /></ConLayout></RutaProtegida>         } />         <Route path="/perfil" element={
+          <Route path="/asistencia" element={
+            <RutaProtegida><ConLayout><MiAsistencia /></ConLayout></RutaProtegida>
+          } />
+          <Route path="/companeros" element={
+            <RutaProtegida><ConLayout><MisCompaneros /></ConLayout></RutaProtegida>
+          } />
+          <Route path="/perfil" element={
             <RutaProtegida>
               <ConLayout><Perfil /></ConLayout>
             </RutaProtegida>
@@ -150,7 +157,12 @@ export default function App() {
               <ConLayout><EventoForm /></ConLayout>
             </RutaProtegida>
           } />
-          <Route path="/admin/asistencia" element={           <RutaProtegida rolesPermitidos={['admin','director']}>             <ConLayout><AsistenciaAdmin /></ConLayout>           </RutaProtegida>         } />         <Route path="/admin/avisos" element={
+          <Route path="/admin/asistencia" element={
+            <RutaProtegida rolesPermitidos={['admin','director']}>
+              <ConLayout><AsistenciaAdmin /></ConLayout>
+            </RutaProtegida>
+          } />
+          <Route path="/admin/avisos" element={
             <RutaProtegida rolesPermitidos={['admin', 'director']}>
               <ConLayout><AvisosAdmin /></ConLayout>
             </RutaProtegida>
@@ -168,6 +180,11 @@ export default function App() {
           <Route path="/admin/blog/:id" element={
             <RutaProtegida rolesPermitidos={['admin', 'director']}>
               <ConLayout><ArticuloForm /></ConLayout>
+            </RutaProtegida>
+          } />
+          <Route path="/admin/estudio" element={
+            <RutaProtegida rolesPermitidos={['admin', 'director']}>
+              <ConLayout><EstudioAdmin /></ConLayout>
             </RutaProtegida>
           } />
 

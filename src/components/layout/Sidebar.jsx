@@ -19,6 +19,7 @@ const NAV_ADMIN = [
   { ruta: '/admin/obras',      label: 'Obras',      icono: 'musica' },
   { ruta: '/admin/eventos',    label: 'Eventos',    icono: 'calendario' },
   { ruta: '/admin/asistencia', label: 'Asistencia', icono: 'calendario' },
+  { ruta: '/admin/estudio',    label: 'Estudio',    icono: 'estudio' },
   { ruta: '/admin/avisos',     label: 'Avisos',     icono: 'campana' },
   { ruta: '/admin/blog',       label: 'Textos',     icono: 'blog' },
   { ruta: '/admin/usuarios',   label: 'Cantantes',  icono: 'usuarios' },
@@ -33,6 +34,7 @@ const ICONOS = {
   perfil:     "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
   dashboard:  "M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z",
   usuarios:   "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z",
+  estudio:    "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z",
 }
 
 function LogoCorum() {
@@ -75,16 +77,16 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
     ? perfil.nombre.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
     : '?'
 
-function isActive(ruta, esMenuAdmin) {
-  if (esMenuAdmin) {
-    if (ruta === '/admin') return location.pathname === '/admin'
-    return location.pathname.startsWith(ruta)
-  } else {
-    if (location.pathname.startsWith('/admin')) return false
-    if (ruta === '/') return location.pathname === '/'
-    return location.pathname.startsWith(ruta)
+  function isActive(ruta, esMenuAdmin) {
+    if (esMenuAdmin) {
+      if (ruta === '/admin') return location.pathname === '/admin'
+      return location.pathname.startsWith(ruta)
+    } else {
+      if (location.pathname.startsWith('/admin')) return false
+      if (ruta === '/') return location.pathname === '/'
+      return location.pathname.startsWith(ruta)
+    }
   }
-}
 
   function handleNavegar(ruta) {
     navigate(ruta)
