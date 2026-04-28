@@ -199,7 +199,7 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
         </div>
 
         {/* Línea separadora */}
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0 14px' }} />
+        <div style={{ height: '8px' }} />
 
         {/* Cerrar sesión + CORUM */}
         <div style={{ padding: '10px 14px 0' }}>
