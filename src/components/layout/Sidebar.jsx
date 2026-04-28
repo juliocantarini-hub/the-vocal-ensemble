@@ -39,7 +39,7 @@ const ICONOS = {
 
 function LogoCorum() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', paddingTop: '18px', paddingBottom: '10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', paddingTop: '24px', paddingBottom: '15px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
         <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
