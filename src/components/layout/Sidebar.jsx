@@ -159,11 +159,11 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
       </nav>
 
       {/* Footer */}
-      <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'sticky', bottom: 0, background: '#0A4A3A' }}>
+      <div style={{ position: 'sticky', bottom: 0, background: '#0A4A3A' }}>
 
         {/* Popup ayuda */}
         {mostrarAyuda && (
-          <div style={{ background: '#0F6E56', borderRadius: '10px', padding: '12px 14px', marginBottom: '10px', position: 'relative', border: '1px solid rgba(255,255,255,0.15)' }}>
+          <div style={{ margin: '0 14px 10px', background: '#0F6E56', borderRadius: '10px', padding: '12px 14px', position: 'relative', border: '1px solid rgba(255,255,255,0.15)' }}>
             <button onClick={() => setMostrarAyuda(false)}
               style={{ position: 'absolute', top: '6px', right: '8px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '14px', lineHeight: 1 }}>
               ✕
@@ -177,32 +177,38 @@ export default function Sidebar({ seccionAdmin, toggleAdmin, onNavegar }) {
           </div>
         )}
 
-        {/* Nombre + ayuda */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#1D9E75', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '600', color: 'white', flexShrink: 0 }}>
-            {iniciales}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {perfil?.nombre?.split(' ')[0] || '—'}
+        {/* Nombre + ayuda — sin borde arriba */}
+        <div style={{ padding: '12px 14px 10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#1D9E75', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '600', color: 'white', flexShrink: 0 }}>
+              {iniciales}
             </div>
-            <div style={{ fontSize: '10px', color: 'rgba(159,225,203,0.6)', textTransform: 'capitalize' }}>
-              {perfil?.voz || perfil?.rol || '—'}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.9)', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {perfil?.nombre?.split(' ')[0] || '—'}
+              </div>
+              <div style={{ fontSize: '10px', color: 'rgba(159,225,203,0.6)', textTransform: 'capitalize' }}>
+                {perfil?.voz || perfil?.rol || '—'}
+              </div>
             </div>
+            <button onClick={() => setMostrarAyuda(v => !v)}
+              style={{ width: '24px', height: '24px', borderRadius: '50%', background: mostrarAyuda ? '#1D9E75' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '12px', fontWeight: '600', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              ?
+            </button>
           </div>
-          <button onClick={() => setMostrarAyuda(v => !v)}
-            style={{ width: '24px', height: '24px', borderRadius: '50%', background: mostrarAyuda ? '#1D9E75' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '12px', fontWeight: '600', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            ?
-          </button>
         </div>
 
-        <button onClick={cerrarSesion}
-          style={{ width: '100%', padding: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.45)', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', cursor: 'pointer' }}>
-          Cerrar sesión
-        </button>
+        {/* Línea separadora */}
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0 14px' }} />
 
-        {/* Logo CORUM */}
-        <LogoCorum />
+        {/* Cerrar sesión + CORUM */}
+        <div style={{ padding: '10px 14px 0' }}>
+          <button onClick={cerrarSesion}
+            style={{ width: '100%', padding: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.45)', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', cursor: 'pointer' }}>
+            Cerrar sesión
+          </button>
+          <LogoCorum />
+        </div>
 
       </div>
     </div>
