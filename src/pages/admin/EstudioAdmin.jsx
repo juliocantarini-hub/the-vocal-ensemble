@@ -15,14 +15,12 @@ export default function EstudioAdmin() {
   const cargar = useCallback(async () => {
     setCargando(true)
 
-    // Total de obras activas
     const { count: countObras } = await supabase
       .from('obras')
       .select('*', { count: 'exact', head: true })
 
     setTotalObras(countObras || 0)
 
-    // Cantantes activos
     const { data: cantantes } = await supabase
       .from('perfiles')
       .select('id, nombre, voz')
@@ -36,30 +34,34 @@ export default function EstudioAdmin() {
       return
     }
 
-    // Actividad de estudio
     const { data: actividad } = await supabase
       .from('actividad_estudio')
       .select('usuario_id, obra_id, tipo')
 
-    // Calcular stats por cantante
     const stats = cantantes.map(c => {
       const actos = actividad?.filter(a => a.usuario_id === c.id) || []
-      const obrasVistas = new Set(actos.filter(a => a.tipo === 'partitura').map(a => a.obra_id))
+
+      // Obras únicas visitadas (apertura)
+      const obrasVistas = new Set(actos.filter(a => a.tipo === 'apertura').map(a => a.obra_id))
+      // Obras únicas con audio escuchado
       const obrasAudio  = new Set(actos.filter(a => a.tipo === 'audio').map(a => a.obra_id))
-      const obrasUnicas = new Set(actos.map(a => a.obra_id))
-      const porcentaje  = countObras > 0 ? Math.round((obrasUnicas.size / countObras) * 100) : 0
+      // Total de clicks en "Abrir partitura"
+      const aperturas   = actos.filter(a => a.tipo === 'partitura_abierta').length
+      // Total de clicks en audio (índice de dedicación)
+      const reproducciones = actos.filter(a => a.tipo === 'audio').length
+
+      const porcentaje = countObras > 0 ? Math.round((obrasVistas.size / countObras) * 100) : 0
+
       return {
         ...c,
-        partituras: actos.filter(a => a.tipo === 'partitura').length,
-        audios:     actos.filter(a => a.tipo === 'audio').length,
-        obrasVistas: obrasVistas.size,
-        obrasAudio:  obrasAudio.size,
-        obrasUnicas: obrasUnicas.size,
+        obrasVistas:    obrasVistas.size,
+        obrasAudio:     obrasAudio.size,
+        aperturas,
+        reproducciones,
         porcentaje,
       }
     })
 
-    // Ordenar por porcentaje desc
     stats.sort((a, b) => b.porcentaje - a.porcentaje)
     setDatos(stats)
     setCargando(false)
@@ -122,8 +124,8 @@ export default function EstudioAdmin() {
               <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
                 <Stat label="Obras vistas" valor={`${d.obrasVistas}/${totalObras}`} />
                 <Stat label="Con audio" valor={`${d.obrasAudio}/${totalObras}`} />
-                <Stat label="Aperturas" valor={d.partituras} />
-                <Stat label="Reproducc." valor={d.audios} />
+                <Stat label="Aperturas" valor={d.aperturas} />
+                <Stat label="Reproducc." valor={d.reproducciones} />
               </div>
             </div>
           ))}
@@ -139,7 +141,7 @@ export default function EstudioAdmin() {
             <span>Progreso</span>
             <span>Obras vistas</span>
             <span>Con audio</span>
-            <span>Aperturas / Rep.</span>
+            <span>Apert. / Rep.</span>
           </div>
           {filtrados.length === 0 && (
             <div style={{ padding: '32px', textAlign: 'center', color: '#888780', fontSize: '13px' }}>Sin datos aún. Los registros aparecerán cuando los cantantes abran obras.</div>
@@ -156,7 +158,7 @@ export default function EstudioAdmin() {
               </div>
               <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.obrasVistas} de {totalObras}</span>
               <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.obrasAudio} de {totalObras}</span>
-              <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.partituras} / {d.audios}</span>
+              <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.aperturas} / {d.reproducciones}</span>
             </div>
           ))}
         </div>

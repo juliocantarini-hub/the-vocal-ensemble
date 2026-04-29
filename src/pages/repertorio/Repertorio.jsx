@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useObras } from '../../hooks/useObras'
 import { useAuth } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 
 const ESTADOS = [
   { valor: '',          label: 'Todas' },
@@ -18,6 +19,12 @@ const BADGE = {
 }
 
 const ORDEN_ESTADO = { concierto: 0, estudio: 1, activo: 2, archivado: 3 }
+
+async function registrarActividad(usuarioId, obraId, tipo) {
+  try {
+    await supabase.from('actividad_estudio').insert({ usuario_id: usuarioId, obra_id: obraId, tipo })
+  } catch (e) {}
+}
 
 function Badge({ estado }) {
   const b = BADGE[estado] || BADGE.archivado
@@ -50,7 +57,7 @@ function MatIcon({ tiene, title }) {
 
 export default function Repertorio() {
   const navigate = useNavigate()
-  const { perfil } = useAuth()
+  const { perfil, usuario } = useAuth()
   const [busqueda, setBusqueda] = useState('')
   const [estadoFiltro, setEstadoFiltro] = useState('')
 
@@ -66,6 +73,13 @@ export default function Repertorio() {
       return oa - ob
     })
   }, [obras])
+
+  async function handleClickObra(obraId) {
+    if (usuario) {
+      registrarActividad(usuario.id, obraId, 'apertura')
+    }
+    navigate(`/repertorio/${obraId}`)
+  }
 
   return (
     <div>
@@ -138,7 +152,7 @@ export default function Repertorio() {
       {!cargando && !error && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {obrasFiltradas.map(obra => (
-            <div key={obra.id} onClick={() => navigate(`/repertorio/${obra.id}`)}
+            <div key={obra.id} onClick={() => handleClickObra(obra.id)}
               style={{
                 background: '#FFFFFF',
                 border: obra.estado === 'concierto' ? '1px solid #F0C5B4' : '1px solid #E8E6DF',

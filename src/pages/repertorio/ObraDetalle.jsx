@@ -32,9 +32,7 @@ function useEsMovil() {
 async function registrarActividad(usuarioId, obraId, tipo) {
   try {
     await supabase.from('actividad_estudio').insert({ usuario_id: usuarioId, obra_id: obraId, tipo })
-  } catch (e) {
-    // silencioso, no interrumpe la experiencia
-  }
+  } catch (e) {}
 }
 
 export default function ObraDetalle() {
@@ -47,30 +45,8 @@ export default function ObraDetalle() {
   const [guardando, setGuardando] = useState(false)
   const [mensajeGuardado, setMensajeGuardado] = useState('')
   const [audioSeleccionado, setAudioSeleccionado] = useState(null)
-  const partituraRegistrada = useRef(false)
-  const audioRegistrado = useRef(false)
 
   const progresoActual = progreso ?? obra?.progreso ?? 'pendiente'
-
-  // Registrar apertura de partitura (una sola vez por visita)
-  useEffect(() => {
-    if (obra && usuario && !partituraRegistrada.current && obra.drive_partitura_id) {
-      partituraRegistrada.current = true
-      registrarActividad(usuario.id, id, 'partitura')
-    }
-  }, [obra, usuario, id])
-
-  // Registrar visualización de audio inicial (una sola vez por visita)
-  useEffect(() => {
-    if (obra && usuario && !audioRegistrado.current) {
-      const audiosDisponibles = Object.entries(NOMBRES_AUDIO)
-        .filter(([key]) => obra[key])
-      if (audiosDisponibles.length > 0) {
-        audioRegistrado.current = true
-        registrarActividad(usuario.id, id, 'audio')
-      }
-    }
-  }, [obra, usuario, id])
 
   function handleSeleccionarAudio(audio) {
     setAudioSeleccionado(audio)
@@ -214,14 +190,22 @@ export default function ObraDetalle() {
 
       {/* Partitura — siempre abajo en móvil */}
       {esMovil && (
-        <DriveVisor fileId={obra.drive_partitura_id} titulo={obra.titulo} />
+        <DriveVisor
+          fileId={obra.drive_partitura_id}
+          titulo={obra.titulo}
+          onAbrir={() => usuario && registrarActividad(usuario.id, id, 'partitura_abierta')}
+        />
       )}
 
       {/* Desktop: partitura izquierda, panel derecha */}
       {!esMovil && (
         <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
           <div style={{ flex: '1 1 300px', minWidth: 0 }}>
-            <DriveVisor fileId={obra.drive_partitura_id} titulo={obra.titulo} />
+            <DriveVisor
+              fileId={obra.drive_partitura_id}
+              titulo={obra.titulo}
+              onAbrir={() => usuario && registrarActividad(usuario.id, id, 'partitura_abierta')}
+            />
           </div>
           <div style={{ width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {audiosDisponibles.length > 0 && (

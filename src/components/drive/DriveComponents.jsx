@@ -13,7 +13,7 @@ export function driveUrlImprimir(fileId) {
   return `https://drive.google.com/file/d/${fileId}/view`
 }
 
-export function DriveVisor({ fileId, titulo = 'Partitura' }) {
+export function DriveVisor({ fileId, titulo = 'Partitura', onAbrir }) {
   const [estado, setEstado] = useState('cargando')
   if (!fileId) {
     return (
@@ -41,7 +41,13 @@ export function DriveVisor({ fileId, titulo = 'Partitura' }) {
       />
       {estado === 'ok' && (
         <div style={estilos.pdfFooter}>
-          <a href={driveUrlPDF(fileId)} target="_blank" rel="noopener noreferrer" style={estilos.linkBtn}>
+          
+            href={driveUrlPDF(fileId)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={estilos.linkBtn}
+            onClick={() => onAbrir && onAbrir()}
+          >
             Abrir ↗
           </a>
           <a href={driveUrlDescarga(fileId)} target="_blank" rel="noopener noreferrer" style={{ ...estilos.linkBtn, color: '#5F5E5A' }}>
