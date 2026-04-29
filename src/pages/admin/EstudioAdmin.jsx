@@ -41,23 +41,20 @@ export default function EstudioAdmin() {
     const stats = cantantes.map(c => {
       const actos = actividad?.filter(a => a.usuario_id === c.id) || []
 
-      // Obras únicas visitadas (apertura)
-      const obrasVistas = new Set(actos.filter(a => a.tipo === 'apertura').map(a => a.obra_id))
-      // Obras únicas con audio escuchado
-      const obrasAudio  = new Set(actos.filter(a => a.tipo === 'audio').map(a => a.obra_id))
-      // Total de clicks en "Abrir partitura"
-      const aperturas   = actos.filter(a => a.tipo === 'partitura_abierta').length
-      // Total de clicks en audio (índice de dedicación)
-      const reproducciones = actos.filter(a => a.tipo === 'audio').length
+      const obrasVistas   = new Set(actos.filter(a => a.tipo === 'apertura').map(a => a.obra_id))
+      const obrasConAudio = new Set(actos.filter(a => a.tipo === 'audio').map(a => a.obra_id))
+      const obrasAbiertas = actos.filter(a => a.tipo === 'partitura_abierta').length
+      const audiosTotal   = actos.filter(a => a.tipo === 'audio').length
 
-      const porcentaje = countObras > 0 ? Math.round((obrasVistas.size / countObras) * 100) : 0
+      const pctVistas = countObras > 0 ? (obrasVistas.size / countObras) * 100 : 0
+      const pctAudio  = countObras > 0 ? (obrasConAudio.size / countObras) * 100 : 0
+      const porcentaje = Math.round((pctVistas + pctAudio) / 2)
 
       return {
         ...c,
-        obrasVistas:    obrasVistas.size,
-        obrasAudio:     obrasAudio.size,
-        aperturas,
-        reproducciones,
+        obrasVistas:   obrasVistas.size,
+        obrasAbiertas,
+        audiosTotal,
         porcentaje,
       }
     })
@@ -122,10 +119,9 @@ export default function EstudioAdmin() {
               </div>
               <BarraProgreso valor={d.porcentaje} />
               <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
-                <Stat label="Obras vistas" valor={`${d.obrasVistas}/${totalObras}`} />
-                <Stat label="Con audio" valor={`${d.obrasAudio}/${totalObras}`} />
-                <Stat label="Aperturas" valor={d.aperturas} />
-                <Stat label="Reproducc." valor={d.reproducciones} />
+                <Stat label="Obras vistas" valor={d.obrasVistas} />
+                <Stat label="Obras abiertas" valor={d.obrasAbiertas} />
+                <Stat label="Audios escuchados" valor={d.audiosTotal} />
               </div>
             </div>
           ))}
@@ -135,30 +131,26 @@ export default function EstudioAdmin() {
       {/* DESKTOP: tabla */}
       {!cargando && !esMovil && (
         <div style={{ background: '#FFFFFF', border: '1px solid #E8E6DF', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 140px 90px 90px 90px', padding: '10px 16px', background: '#F8F7F3', borderBottom: '1px solid #E8E6DF', fontSize: '11px', fontWeight: '600', color: '#888780', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 100px 110px 110px 130px', padding: '10px 16px', background: '#F8F7F3', borderBottom: '1px solid #E8E6DF', fontSize: '11px', fontWeight: '600', color: '#888780', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
             <span>Cantante</span>
-            <span>Actividad</span>
-            <span>Progreso</span>
+            <span>% Estudio</span>
             <span>Obras vistas</span>
-            <span>Con audio</span>
-            <span>Apert. / Rep.</span>
+            <span>Obras abiertas</span>
+            <span>Audios escuchados</span>
           </div>
           {filtrados.length === 0 && (
-            <div style={{ padding: '32px', textAlign: 'center', color: '#888780', fontSize: '13px' }}>Sin datos aún. Los registros aparecerán cuando los cantantes abran obras.</div>
+            <div style={{ padding: '32px', textAlign: 'center', color: '#888780', fontSize: '13px' }}>Sin datos aún. Los registros aparecerán cuando los cantantes estudien.</div>
           )}
           {filtrados.map((d, i) => (
-            <div key={d.id} style={{ display: 'grid', gridTemplateColumns: '1fr 90px 140px 90px 90px 90px', padding: '12px 16px', alignItems: 'center', borderBottom: i < filtrados.length - 1 ? '1px solid #F1EFE8' : 'none' }}>
+            <div key={d.id} style={{ display: 'grid', gridTemplateColumns: '1fr 100px 110px 110px 130px', padding: '12px 16px', alignItems: 'center', borderBottom: i < filtrados.length - 1 ? '1px solid #F1EFE8' : 'none' }}>
               <div>
                 <div style={{ fontSize: '13px', fontWeight: '500', color: '#1A1A18' }}>{d.nombre || '—'}</div>
                 <div style={{ fontSize: '11px', color: '#888780', textTransform: 'capitalize', marginTop: '1px' }}>{d.voz || '—'}</div>
               </div>
               <PorcentajeBadge valor={d.porcentaje} />
-              <div style={{ paddingRight: '12px' }}>
-                <BarraProgreso valor={d.porcentaje} />
-              </div>
               <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.obrasVistas} de {totalObras}</span>
-              <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.obrasAudio} de {totalObras}</span>
-              <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.aperturas} / {d.reproducciones}</span>
+              <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.obrasAbiertas}</span>
+              <span style={{ fontSize: '12px', color: '#5F5E5A' }}>{d.audiosTotal}</span>
             </div>
           ))}
         </div>
