@@ -22,6 +22,13 @@ function proximoCumple(fechaNacimiento) {
   return diff
 }
 
+function formatearWA(telefono) {
+  if (!telefono) return ''
+  const limpio = telefono.replace(/\D/g, '')
+  if (telefono.startsWith('+54')) return limpio
+  return '549' + limpio.replace(/^0/, '').replace(/^15/, '')
+}
+
 const VOCES_COLOR = {
   soprano:   { bg: '#FAECE7', color: '#712B13' },
   contralto: { bg: '#F3EFF8', color: '#3D1C6E' },
@@ -75,7 +82,6 @@ export default function MisCompaneros() {
         </p>
       </div>
 
-      {/* Cumpleaños hoy */}
       {cumpleHoy.length > 0 && (
         <div style={{ background: 'linear-gradient(135deg, #D85A30, #F0A070)', borderRadius: '12px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{ fontSize: '28px' }}>🎂</span>
@@ -90,7 +96,6 @@ export default function MisCompaneros() {
         </div>
       )}
 
-      {/* Búsqueda y filtros */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="#B4B2A9"
@@ -118,7 +123,6 @@ export default function MisCompaneros() {
         </div>
       </div>
 
-      {/* Skeleton */}
       {cargando && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {[1,2,3,4].map(i => <div key={i} style={{ height: '70px', background: '#F1EFE8', borderRadius: '12px', animation: 'pulse 1.5s ease-in-out infinite' }} />)}
@@ -126,7 +130,6 @@ export default function MisCompaneros() {
         </div>
       )}
 
-      {/* Lista */}
       {!cargando && filtrados.length === 0 && (
         <div style={{ textAlign: 'center', padding: '48px 24px', color: '#888780' }}>
           <p style={{ fontSize: '14px', margin: 0 }}>No hay compañeros que coincidan.</p>
@@ -140,15 +143,14 @@ export default function MisCompaneros() {
             const diasCumple = proximoCumple(c.fecha_nacimiento)
             const cumplePronto = diasCumple !== null && diasCumple <= 7
             const esMiPerfil = c.id === perfil?.id
+            const waUrl = 'https://wa.me/' + formatearWA(c.telefono)
 
             return (
               <div key={c.id} style={{
                 background: '#FFFFFF', border: `1px solid ${esMiPerfil ? '#B4D8CE' : '#E8E6DF'}`,
                 borderRadius: '12px', padding: '14px 16px',
                 display: 'flex', alignItems: 'center', gap: '14px',
-                opacity: 1,
               }}>
-                {/* Inicial */}
                 <div style={{
                   width: '44px', height: '44px', borderRadius: '50%',
                   background: vc.bg, display: 'flex', alignItems: 'center',
@@ -158,7 +160,6 @@ export default function MisCompaneros() {
                   {c.nombre?.charAt(0)?.toUpperCase() || '?'}
                 </div>
 
-                {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A18' }}>
@@ -178,9 +179,9 @@ export default function MisCompaneros() {
                   </div>
                   <div style={{ fontSize: '12px', color: '#888780', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     {c.telefono && (
-                      <a href={`https://wa.me/${c.telefono.startsWith('+54') ? c.telefono.replace(/\D/g, '') : '549' + c.telefono.replace(/\D/g, '').replace(/^0/, '').replace(/^15/, '')}`}
-  💬 {c.telefono}
-</a>
+                      <a href={waUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0F6E56', textDecoration: 'none', fontWeight: '500' }}>
+                        💬 {c.telefono}
+                      </a>
                     )}
                     {c.fecha_nacimiento && (
                       <span>
