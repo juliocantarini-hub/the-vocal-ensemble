@@ -1,6 +1,6 @@
 {
   "name": "Coro Santa Ethnea",
-  "short_name": "Coro S_Ethnea",
+  "short_name": "CS_Ethnea",
   "description": "Plataforma de estudio y organización coral",
   "start_url": "./index.html",
   "scope": "/",
