@@ -184,7 +184,7 @@ export default function ObraForm() {
           <select value={form.estado} onChange={set('estado')} style={inputStyle}>
             {ESTADOS.map(e => (
               <option key={e} value={e}>
-                {e === 'estudio' ? 'En estudio' : e === 'activo' ? 'Repertorio activo' : e === 'concierto' ? 'Próximo concierto' : 'Archivado'}
+                {e === 'estudio' ? 'En estudio' : e === 'activo' ? 'Repertorio activo' : e === 'concierto' ? 'Próximo ensayo' : 'Archivado'}
               </option>
             ))}
           </select>
