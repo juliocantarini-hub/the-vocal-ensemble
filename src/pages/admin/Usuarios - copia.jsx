@@ -25,10 +25,6 @@ export default function Usuarios() {
   const [confirmDesactivar, setConfirmDesactivar] = useState(null)
   const [confirmEliminar, setConfirmEliminar]     = useState(null)
   const [procesando, setProcesando] = useState(false)
-  const [resetPass, setResetPass]   = useState(null)
-  const [nuevaPass, setNuevaPass]   = useState('')
-  const [confirmarPass, setConfirmarPass] = useState('')
-  const [resetando, setResetando]   = useState(false)
   const esMovil = useEsMovil()
 
   const cargar = useCallback(async () => {
@@ -39,10 +35,6 @@ export default function Usuarios() {
   }, [])
 
   useEffect(() => { cargar() }, [cargar])
-
-  useEffect(() => {
-    if (resetPass) setBusqueda('')
-  }, [resetPass])
 
   const filtrados = usuarios.filter(u =>
     !busqueda ||
@@ -99,55 +91,6 @@ export default function Usuarios() {
     setTimeout(() => setMensaje(''), 5000)
   }
 
-  async function handleResetPassword() {
-    if (!resetPass) return
-    if (!nuevaPass || nuevaPass.length < 6) {
-      setMensaje('La contraseña debe tener al menos 6 caracteres.')
-      setTimeout(() => setMensaje(''), 3000)
-      return
-    }
-    if (nuevaPass !== confirmarPass) {
-      setMensaje('Las contraseñas no coinciden.')
-      setTimeout(() => setMensaje(''), 3000)
-      return
-    }
-    setResetando(true)
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const token = session?.access_token
-      const res = await fetch(
-        'https://xfddjbldwfqkdlhnwwhk.supabase.co/functions/v1/reset-password',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({ user_id: resetPass.id, new_password: nuevaPass }),
-        }
-      )
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Error desconocido')
-      setMensaje(`Contraseña de ${resetPass.nombre} actualizada correctamente.`)
-      setTimeout(() => setMensaje(''), 4000)
-      setResetPass(null)
-      setNuevaPass('')
-      setConfirmarPass('')
-    } catch (err) {
-      setMensaje(`Error: ${err.message}`)
-      setTimeout(() => setMensaje(''), 4000)
-    } finally {
-      setResetando(false)
-    }
-  }
-
-  function abrirReset(u) {
-    setResetPass(u)
-    setNuevaPass('')
-    setConfirmarPass('')
-    setBusqueda('')
-  }
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
@@ -174,7 +117,6 @@ export default function Usuarios() {
           <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
         </svg>
         <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar cantante..."
-          autoComplete="off"
           style={{ width: '100%', height: '36px', border: '1px solid #D3D1C7', borderRadius: '8px', padding: '0 12px 0 32px', fontSize: '13px', outline: 'none', background: '#FFFFFF', boxSizing: 'border-box' }} />
       </div>
 
@@ -210,14 +152,10 @@ export default function Usuarios() {
                     {u.rol}
                   </span>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                   <button onClick={() => setEditando({ ...u })}
                     style={{ padding: '5px 12px', fontSize: '12px', borderRadius: '6px', border: '1px solid #D3D1C7', background: 'none', cursor: 'pointer', color: '#0F6E56', fontWeight: '500' }}>
                     Editar
-                  </button>
-                  <button onClick={() => abrirReset(u)}
-                    style={{ padding: '5px 12px', fontSize: '12px', borderRadius: '6px', border: '1px solid #C5D8F0', background: 'none', cursor: 'pointer', color: '#1A5276', fontWeight: '500' }}>
-                    Contraseña
                   </button>
                   {u.estado !== 'inactivo' && u.estado !== 'pendiente' && (
                     <button onClick={() => setConfirmDesactivar(u)}
@@ -267,10 +205,6 @@ export default function Usuarios() {
                     style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '6px', border: '1px solid #D3D1C7', background: 'none', cursor: 'pointer', color: '#0F6E56', fontWeight: '500' }}>
                     Editar
                   </button>
-                  <button onClick={() => abrirReset(u)}
-                    style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '6px', border: '1px solid #C5D8F0', background: 'none', cursor: 'pointer', color: '#1A5276', fontWeight: '500' }}>
-                    Contraseña
-                  </button>
                   {u.estado !== 'inactivo' && u.estado !== 'pendiente' && (
                     <button onClick={() => setConfirmDesactivar(u)}
                       style={{ padding: '4px 8px', fontSize: '12px', borderRadius: '6px', border: '1px solid #F0C5B4', background: 'none', cursor: 'pointer', color: '#A32D2D' }}>
@@ -287,45 +221,6 @@ export default function Usuarios() {
               </div>
             )
           })}
-        </div>
-      )}
-
-      {/* Modal reset contraseña */}
-      {resetPass && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '24px' }}>
-          <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '28px', maxWidth: '400px', width: '100%', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
-            <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: 'normal', margin: '0 0 4px' }}>Resetear contraseña</h3>
-            <p style={{ fontSize: '13px', color: '#888780', margin: '0 0 20px' }}>{resetPass.nombre}</p>
-
-            <div style={{ marginBottom: '14px' }}>
-              <label style={labelStyle}>Nueva contraseña</label>
-              <input type="password" value={nuevaPass} onChange={e => setNuevaPass(e.target.value)}
-                placeholder="Mínimo 6 caracteres" style={inputStyle} />
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={labelStyle}>Confirmar contraseña</label>
-              <input type="password" value={confirmarPass} onChange={e => setConfirmarPass(e.target.value)}
-                placeholder="Repetí la contraseña" style={inputStyle} />
-            </div>
-
-            {nuevaPass && confirmarPass && nuevaPass !== confirmarPass && (
-              <p style={{ fontSize: '12px', color: '#A32D2D', margin: '-12px 0 16px', background: '#FCEBEB', padding: '6px 10px', borderRadius: '6px' }}>
-                Las contraseñas no coinciden.
-              </p>
-            )}
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => { setResetPass(null); setNuevaPass(''); setConfirmarPass('') }}
-                style={{ flex: 1, height: '40px', borderRadius: '8px', border: '1px solid #D3D1C7', background: 'none', cursor: 'pointer', fontSize: '13px' }}>
-                Cancelar
-              </button>
-              <button onClick={handleResetPassword} disabled={resetando}
-                style={{ flex: 2, height: '40px', borderRadius: '8px', border: 'none', background: resetando ? '#7FB5A8' : '#0F6E56', color: '#FFFFFF', cursor: resetando ? 'not-allowed' : 'pointer', fontSize: '13px', fontWeight: '500' }}>
-                {resetando ? 'Guardando...' : 'Guardar contraseña'}
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
