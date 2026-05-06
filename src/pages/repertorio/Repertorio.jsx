@@ -49,18 +49,20 @@ function MatIcon({ tiene, title }) {
   )
 }
 
-function useDedicacion(usuarioId, totalObras) {
+function useDedicacion(usuarioId, obras) {
   const [porcentaje, setPorcentaje] = useState(null)
 
   useEffect(() => {
-    if (!usuarioId || !totalObras) return
+    if (!usuarioId || !obras || obras.length === 0) return
+    const obraIds = obras.map(o => o.id)
+    const totalObras = obraIds.length
     async function cargar() {
       const { data } = await supabase
         .from('actividad_estudio')
         .select('obra_id')
         .eq('usuario_id', usuarioId)
         .eq('tipo', 'apertura')
-        .eq('coro_id', '6b708de4-d294-40b7-a2d7-392a91e5617d')
+        .in('obra_id', obraIds)
       if (!data) return
       const obrasUnicas = new Set(data.map(a => a.obra_id))
       const pctCobertura  = (obrasUnicas.size / totalObras) * 100
@@ -68,7 +70,7 @@ function useDedicacion(usuarioId, totalObras) {
       setPorcentaje(Math.round((pctCobertura + pctFrecuencia) / 2))
     }
     cargar()
-  }, [usuarioId, totalObras])
+  }, [usuarioId, obras])
 
   return porcentaje
 }
@@ -92,8 +94,7 @@ export default function Repertorio() {
     })
   }, [obras])
 
-  const totalObras = obras.length
-  const dedicacion = useDedicacion(perfil?.id, totalObras)
+  const dedicacion = useDedicacion(perfil?.id, obras)
 
   const colorDedicacion = dedicacion === null ? '#888780'
     : dedicacion >= 70 ? '#27500A'
