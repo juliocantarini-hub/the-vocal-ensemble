@@ -172,12 +172,16 @@ export async function eliminarObra(id) {
 
 // ─── CRUD de audios ───────────────────────────────────────────────────────────
 export async function guardarAudiosObra(obraId, audios) {
+  // Intentar borrar audios existentes — ignorar error si no hay o sin permisos
   const { error: errorDelete } = await supabase
     .from('obras_audios')
     .delete()
     .eq('obra_id', obraId)
 
-  if (errorDelete) return { ok: false, error: errorDelete.message }
+  if (errorDelete) {
+    console.warn('No se pudieron borrar audios previos:', errorDelete.message)
+    // No retornar error — intentar insertar igual
+  }
 
   const filas = audios
     .filter(a => a.drive_id?.trim())

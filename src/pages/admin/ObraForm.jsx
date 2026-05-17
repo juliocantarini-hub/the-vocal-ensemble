@@ -80,12 +80,14 @@ export default function ObraForm() {
     })
     setPublicada(data.publicada || false)
 
-    const { data: audiosData } = await supabase
+    const { data: audiosData, error: errorAudios } = await supabase
       .from('obras_audios')
       .select('id, voz, parte, drive_id, etiqueta')
       .eq('obra_id', id)
 
-    if (audiosData?.length) {
+    if (errorAudios) {
+      console.warn('Audios no disponibles:', errorAudios.message)
+    } else if (audiosData?.length) {
       const ordenVoz = { general: 0, soprano: 1, contralto: 2, tenor: 3, bajo: 4 }
       const cargados = [...audiosData]
         .sort((a, b) => {
