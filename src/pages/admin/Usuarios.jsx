@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
+import { getCoroActual } from '../../lib/coro'
 
 const ROLES   = ['cantante', 'director', 'admin']
 const VOCES   = ['soprano', 'contralto', 'tenor', 'bajo']
@@ -132,11 +133,12 @@ export default function Usuarios() {
   const esMovil = useEsMovil()
 
   const cargar = useCallback(async () => {
-    setCargando(true)
-    const { data } = await supabase.from('perfiles').select('*').order('nombre')
-    setUsuarios(data || [])
-    setCargando(false)
-  }, [])
+  setCargando(true)
+  const coro = await getCoroActual()
+  const { data } = await supabase.from('perfiles').select('*').eq('coro_id', coro.id).order('nombre')
+  setUsuarios(data || [])
+  setCargando(false)
+}, [])
 
   useEffect(() => { cargar() }, [cargar])
 
