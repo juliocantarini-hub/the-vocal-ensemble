@@ -29,10 +29,8 @@ export default function AppLayout({ children }) {
   const [zoom, setZoom] = useState(getZoom)
 
   useEffect(() => {
-    if (location.pathname.startsWith('/admin')) {
-      setSeccionAdmin(true)
-    }
-  }, [location.pathname])
+  setSeccionAdmin(location.pathname.startsWith('/admin'))
+}, [location.pathname])
 
   useEffect(() => {
     const fn = () => setZoom(getZoom())
