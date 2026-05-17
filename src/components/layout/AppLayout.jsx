@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 
 function useEsMovil() {
@@ -24,13 +24,9 @@ export default function AppLayout({ children }) {
   const location = useLocation()
   const [abierto, setAbierto] = useState(false)
   const [seccionAdmin, setSeccionAdmin] = useState(
-    window.location.pathname.startsWith('/admin')
+    location.pathname.startsWith('/admin')
   )
   const [zoom, setZoom] = useState(getZoom)
-
-  useEffect(() => {
-  setSeccionAdmin(location.pathname.startsWith('/admin'))
-}, [location.pathname])
 
   useEffect(() => {
     const fn = () => setZoom(getZoom())
@@ -38,16 +34,21 @@ export default function AppLayout({ children }) {
     return () => window.removeEventListener('tamanoFuenteCambiado', fn)
   }, [])
 
+  function toggleAdmin(valor) {
+    setSeccionAdmin(valor)
+  }
+
+  const esAdmin = location.pathname.startsWith('/admin')
+  const seccionAdminEfectiva = seccionAdmin || esAdmin
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#F1EFE8' }}>
 
-      {/* Overlay móvil */}
       {esMovil && abierto && (
         <div onClick={() => setAbierto(false)}
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40 }} />
       )}
 
-      {/* Sidebar */}
       {(!esMovil || abierto) && (
         <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 50, display: 'flex', flexDirection: 'column', zoom: zoom }}>
           {esMovil && (
@@ -59,14 +60,13 @@ export default function AppLayout({ children }) {
             </button>
           )}
           <Sidebar
-            seccionAdmin={seccionAdmin}
-            toggleAdmin={setSeccionAdmin}
+            seccionAdmin={seccionAdminEfectiva}
+            toggleAdmin={toggleAdmin}
             onNavegar={() => setAbierto(false)}
           />
         </div>
       )}
 
-      {/* Hamburguesa móvil */}
       {esMovil && !abierto && (
         <button onClick={() => setAbierto(true)}
           style={{ position: 'fixed', top: '12px', left: '12px', zIndex: 60, width: '40px', height: '40px', borderRadius: '10px', background: '#0F6E56', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
@@ -76,7 +76,6 @@ export default function AppLayout({ children }) {
         </button>
       )}
 
-      {/* Contenido */}
       <main style={{ marginLeft: esMovil ? 0 : '210px', padding: esMovil ? '60px 16px 24px' : '28px 32px', flex: 1, minHeight: '100vh', width: esMovil ? '100%' : 'auto', zoom: zoom }}>
         {children}
       </main>
