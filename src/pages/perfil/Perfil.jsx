@@ -135,7 +135,7 @@ export default function Perfil() {
               <input value={form.dni} onChange={set('dni')} placeholder="12345678" style={estilos.input} />
             </Campo>
             <Campo label="Fecha de nacimiento">
-              <input type="date" value={form.fecha_nacimiento} onChange={set('fecha_nacimiento')} style={estilos.input} />
+              <input type="date" value={form.fecha_nacimiento} onChange={set('fecha_nacimiento')} style={estilos.input} lang="es-AR" />
             </Campo>
           </div>
 
