@@ -6,13 +6,15 @@ import { driveUrlPDF, driveUrlAudio } from '../../components/drive/DriveComponen
 
 const ESTADOS = ['estudio', 'activo', 'concierto', 'archivado']
 
-const VOCES_BASE = ['soprano', 'contralto', 'tenor', 'bajo']
+const VOCES_BASE = ['soprano', 'mezzo', 'contralto', 'tenor', 'baritono', 'bajo']
 
 const VOCES_LABELS = {
   general:   'Audio general',
   soprano:   'Soprano',
   contralto: 'Contralto',
   tenor:     'Tenor',
+  mezzo:     'Mezzo',
+  baritono:  'Barítono',
   bajo:      'Bajo',
 }
 
@@ -24,8 +26,10 @@ const FORM_VACIO = {
 const AUDIOS_INICIALES = [
   { _key: 'general-1',   voz: 'general',   parte: 1, drive_id: '', etiqueta: '' },
   { _key: 'soprano-1',   voz: 'soprano',   parte: 1, drive_id: '', etiqueta: '' },
+  { _key: 'mezzo-1',     voz: 'mezzo',     parte: 1, drive_id: '', etiqueta: '' },
   { _key: 'contralto-1', voz: 'contralto', parte: 1, drive_id: '', etiqueta: '' },
   { _key: 'tenor-1',     voz: 'tenor',     parte: 1, drive_id: '', etiqueta: '' },
+  { _key: 'baritono-1',  voz: 'baritono',  parte: 1, drive_id: '', etiqueta: '' },
   { _key: 'bajo-1',      voz: 'bajo',      parte: 1, drive_id: '', etiqueta: '' },
 ]
 
@@ -88,7 +92,7 @@ export default function ObraForm() {
     if (errorAudios) {
       console.warn('Audios no disponibles:', errorAudios.message)
     } else if (audiosData?.length) {
-      const ordenVoz = { general: 0, soprano: 1, contralto: 2, tenor: 3, bajo: 4 }
+      const ordenVoz = { general: 0, soprano: 1, mezzo: 2, contralto: 3, tenor: 4, baritono: 5, bajo: 6 }
       const cargados = [...audiosData]
         .sort((a, b) => {
           const diff = (ordenVoz[a.voz] ?? 99) - (ordenVoz[b.voz] ?? 99)
