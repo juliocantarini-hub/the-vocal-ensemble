@@ -63,7 +63,7 @@ export default function MisCompaneros() {
 
   const filtrados = cantantes.filter(c => {
     const coincideBusqueda = !busqueda || c.nombre?.toLowerCase().includes(busqueda.toLowerCase())
-    const coincideVoz = !vozFiltro || c.voz === vozFiltro
+    const coincideVoz = !vozFiltro || c.voz?.toLowerCase() === vozFiltro
     return coincideBusqueda && coincideVoz
   })
 

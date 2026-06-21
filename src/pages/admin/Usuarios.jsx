@@ -160,6 +160,7 @@ export default function Usuarios() {
     if (!editando) return
     setGuardando(true)
     const scrollY = window.scrollY
+    const id = editando.id
     const cambios = {
       rol: editando.rol,
       voz: editando.voz,
@@ -169,10 +170,15 @@ export default function Usuarios() {
       dni: editando.dni || null,
       telefono: editando.telefono || null,
     }
-    await supabase.from('perfiles').update(cambios).eq('id', editando.id)
+    const { error } = await supabase.from('perfiles').update(cambios).eq('id', id)
     setGuardando(false)
+    if (error) {
+      setMensaje('Error al guardar. Intentá de nuevo.')
+      setTimeout(() => setMensaje(''), 3000)
+      return
+    }
     setEditando(null)
-    actualizarLocal(editando.id, cambios)
+    actualizarLocal(id, cambios)
     setMensaje('Usuario actualizado.')
     setTimeout(() => setMensaje(''), 3000)
     requestAnimationFrame(() => window.scrollTo(0, scrollY))
