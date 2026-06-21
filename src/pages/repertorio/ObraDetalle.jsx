@@ -14,8 +14,10 @@ const PROGRESO_OPTS = [
 const VOCES_LABELS = {
   general:   'DEMO',
   soprano:   'Soprano',
+  mezzo:     'Mezzo',
   contralto: 'Contralto',
   tenor:     'Tenor',
+  baritono:  'Barítono',
   bajo:      'Bajo',
 }
 
@@ -114,7 +116,11 @@ export default function ObraDetalle() {
     )
   }
 
-  const audiosDisponibles = obra.audios || []
+  const ORDEN_VOZ = { general: 0, soprano: 1, mezzo: 2, contralto: 3, tenor: 4, baritono: 5, bajo: 6 }
+  const audiosDisponibles = [...(obra.audios || [])].sort((a, b) => {
+    const diff = (ORDEN_VOZ[a.voz] ?? 99) - (ORDEN_VOZ[b.voz] ?? 99)
+    return diff !== 0 ? diff : a.parte - b.parte
+  })
 
   const conteoPorVoz = audiosDisponibles.reduce((acc, a) => {
     acc[a.voz] = (acc[a.voz] || 0) + 1
