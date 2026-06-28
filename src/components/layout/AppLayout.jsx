@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
-import { supabase } from '../lib/supabaseClient'
+import { supabase } from '../../lib/supabase'
 import { usePushSubscription } from '../hooks/usePushSubscription'
 
 function useEsMovil() {
