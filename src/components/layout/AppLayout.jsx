@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { supabase } from '../../lib/supabase'
-import { usePushSubscription } from '../hooks/usePushSubscription'
+import { usePushSubscription } from '../../hooks/usePushSubscription'
 
 function useEsMovil() {
   const [esMovil, setEsMovil] = useState(window.innerWidth <= 768)
