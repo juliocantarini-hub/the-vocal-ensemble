@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
+import { getCoroActual } from '../../lib/coro'
 
 function useEsMovil() {
   return window.innerWidth <= 768
@@ -15,11 +16,14 @@ export default function EstudioAdmin() {
   const cargar = useCallback(async () => {
     setCargando(true)
 
-  const { count: countObras } = await supabase
-     .from('obras')
-     .select('*', { count: 'exact', head: true })
-     .eq('coro_id', '6b708de4-d294-40b7-a2d7-392a91e5617d')
-     .eq('publicada', true)
+    const coro = await getCoroActual()
+    if (!coro) { setCargando(false); return }
+
+    const { count: countObras } = await supabase
+      .from('obras')
+      .select('*', { count: 'exact', head: true })
+      .eq('coro_id', coro.id)
+      .eq('publicada', true)
 
     setTotalObras(countObras || 0)
 
@@ -28,7 +32,7 @@ export default function EstudioAdmin() {
       .select('id, nombre, voz')
       .eq('rol', 'cantante')
       .eq('estado', 'activo')
-      .eq('coro_id', '6b708de4-d294-40b7-a2d7-392a91e5617d')
+      .eq('coro_id', coro.id)
       .order('nombre')
 
     if (!cantantes || cantantes.length === 0) {
