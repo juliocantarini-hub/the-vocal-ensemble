@@ -93,13 +93,15 @@ function imprimirListado(usuarios, camposSeleccionados) {
     </head>
     <body>
       <div class="encabezado">
-        <h1>Coro Almafuerte</h1>
+        <h1>${import.meta.env.VITE_CORO_NOMBRE || "Mi Coro"}</h1>
         ${director ? `<div class="director">Director/a: ${director.nombre}</div>` : ''}
         <div class="fecha">Generado el ${new Date().toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
       </div>
       ${seccion('Sopranos', porVoz.soprano)}
+      ${porVoz.mezzo?.length ? seccion('Mezzos', porVoz.mezzo) : ''}
       ${seccion('Contraltos', porVoz.contralto)}
       ${seccion('Tenores', porVoz.tenor)}
+      ${porVoz.baritono?.length ? seccion('Barítono', porVoz.baritono) : ''}
       ${seccion('Bajos', porVoz.bajo)}
       ${sinVoz.length ? seccion('Sin cuerda asignada', sinVoz) : ''}
       ${seccion('Dirección', directores)}
