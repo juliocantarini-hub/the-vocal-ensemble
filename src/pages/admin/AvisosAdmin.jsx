@@ -13,7 +13,7 @@ async function enviarNotificacionAviso(titulo, cuerpo) {
     const coro = await getCoroActual()
     if (!coro) return
     await supabase.functions.invoke('enviar-notificaciones', {
-      body: { coro_id: coro.id, titulo, cuerpo: cuerpo || '' }
+      body: { coro_id: coro.id, titulo: `Nuevo aviso: ${titulo}`, cuerpo: cuerpo || '' }
     })
   } catch (err) {
     console.error('Error al enviar notificación:', err)
