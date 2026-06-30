@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { getCoroActual } from '../../lib/coro'
 import { crearObra, actualizarObra, publicarObra, guardarAudiosObra } from '../../hooks/useObras'
 import { driveUrlPDF, driveUrlAudio } from '../../components/drive/DriveComponents'
+
+async function enviarNotificacionObra(titulo) {
+  try {
+    const coro = await getCoroActual()
+    if (!coro) return
+    await supabase.functions.invoke('enviar-notificaciones', {
+      body: { coro_id: coro.id, titulo: `Nueva obra: ${titulo}`, cuerpo: 'Ya está disponible en el repertorio' }
+    })
+  } catch (err) {
+    console.error('Error al enviar notificación:', err)
+  }
+}
 
 const ESTADOS = ['estudio', 'activo', 'concierto', 'archivado']
 
@@ -201,8 +214,11 @@ export default function ObraForm() {
       if (!okAudios) { setErrorGlobal(errAudios || 'Error al guardar audios.'); setGuardando(false); return }
     }
 
-    if (publicar && !esEdicion && data?.id) {
+   if (publicar && !esEdicion && data?.id) {
       await publicarObra(data.id, true)
+      await enviarNotificacionObra(datos.titulo)
+    } else if (publicar && esEdicion) {
+      await enviarNotificacionObra(datos.titulo)
     }
 
     setGuardando(false)
