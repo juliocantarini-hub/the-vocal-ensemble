@@ -18,9 +18,6 @@ export function usePushSubscription(user) {
 
     async function suscribir() {
       try {
-        const coro = await getCoroActual()
-        if (!coro) return
-
         const registration = await navigator.serviceWorker.ready
         const permission = await Notification.requestPermission()
         if (permission !== 'granted') return
@@ -32,13 +29,20 @@ export function usePushSubscription(user) {
 
         const { endpoint, keys } = subscription.toJSON()
 
-        await supabase.from('push_suscripciones').upsert({
+        const coro = await getCoroActual()
+
+        const datos = {
           perfil_id: user.id,
-          coro_id: coro.id,
           endpoint,
           p256dh: keys.p256dh,
           auth: keys.auth
-        }, { onConflict: 'perfil_id,endpoint' })
+        }
+        if (coro) datos.coro_id = coro.id
+
+        await supabase.from('push_suscripciones').upsert(
+          datos,
+          { onConflict: 'perfil_id,endpoint' }
+        )
 
       } catch (err) {
         console.error('Error al suscribir push:', err)

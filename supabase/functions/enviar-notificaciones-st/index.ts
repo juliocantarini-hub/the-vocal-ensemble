@@ -23,16 +23,15 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { coro_id, titulo, cuerpo } = await req.json()
+    const { titulo, cuerpo } = await req.json()
 
     if (!titulo) {
       return new Response(JSON.stringify({ error: 'Faltan parámetros' }), { status: 400 })
     }
 
-    let query = supabase.from('push_suscripciones').select('*')
-    if (coro_id) query = query.eq('coro_id', coro_id)
-
-    const { data: suscripciones, error } = await query
+    const { data: suscripciones, error } = await supabase
+      .from('push_suscripciones')
+      .select('*')
 
     if (error) throw error
 
