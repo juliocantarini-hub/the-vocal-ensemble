@@ -5,6 +5,7 @@ import { useEventos, formatHora, diasRestantes } from '../hooks/useEventos'
 import { useObras } from '../hooks/useObras'
 import { useAvisos, tiempoRelativo, TIPO_AVISO } from '../hooks/useAvisos'
 import { useArticulos } from '../hooks/useBlog'
+import MisPagos from '../components/MisPagos'
 
 const ORDEN_ESTADO = { concierto: 0, activo: 1, estudio: 2 }
 
@@ -69,7 +70,7 @@ export default function Inicio() {
           </div>
         )}
       </div>
-
+<MisPagos />
       {/* Stats rápidas */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
         <StatCard val={obras.length} label="Obras en repertorio" color="#0F6E56" bg="#E1F5EE" onClick={() => navigate('/repertorio')} />
