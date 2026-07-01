@@ -1,9 +1,7 @@
 import { useMisPagos } from '../hooks/usePagos'
 import { useAuth } from '../hooks/useAuth'
 
-const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-
-export default function MisPagos() {
+export default function MisPagos({ posicion }) {
   const { perfil } = useAuth()
   const { cuotaPendiente, colectasPendientes, cargando } = useMisPagos(perfil?.id)
 
@@ -11,18 +9,21 @@ export default function MisPagos() {
 
   const hoy = new Date()
   const dia = hoy.getDate()
-  const mostrarAlertaCuota = cuotaPendiente && cuotaPendiente.estado === 'pendiente' && dia > 15
-
-  // Si no hay nada pendiente, no mostrar la sección
+  const hayAlertaCuota = cuotaPendiente && cuotaPendiente.estado === 'pendiente' && dia > 15
   const hayAlgo = cuotaPendiente || colectasPendientes.length > 0
   if (!hayAlgo) return null
 
+  // Si posicion='arriba' solo renderiza cuando hay alerta de cuota
+  if (posicion === 'arriba' && !hayAlertaCuota) return null
+  // Si posicion='abajo' solo renderiza cuando NO hay alerta de cuota
+  if (posicion === 'abajo' && hayAlertaCuota) return null
+
   return (
     <div style={{
-      background: mostrarAlertaCuota ? '#FFF4F1' : '#FFFFFF',
+      background: hayAlertaCuota ? '#FFF4F1' : '#FFFFFF',
       borderRadius: '14px',
       padding: '16px 18px',
-      border: `1px solid ${mostrarAlertaCuota ? '#F5C4B5' : '#E8E6DF'}`,
+      border: `1px solid ${hayAlertaCuota ? '#F5C4B5' : '#E8E6DF'}`,
       marginBottom: '16px',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -45,7 +46,7 @@ export default function MisPagos() {
             <span style={{ fontSize: '13px', color: '#1A1A18' }}>{cuotaPendiente.nombre}</span>
             {cuotaPendiente.monto && (
               <span style={{ fontSize: '12px', color: '#888780', marginLeft: '6px' }}>
-                ${Number(cuotaPendiente.monto).toLocaleString('es-AR')}
+                ${Number(cuotaPendiente.monto).toLocaleString('es-AR', { maximumFractionDigits: 0 })}
               </span>
             )}
           </div>
@@ -66,7 +67,7 @@ export default function MisPagos() {
             <span style={{ fontSize: '13px', color: '#1A1A18' }}>{c.nombre}</span>
             {c.monto && (
               <span style={{ fontSize: '12px', color: '#888780', marginLeft: '6px' }}>
-                ${Number(c.monto).toLocaleString('es-AR')}
+                ${Number(c.monto).toLocaleString('es-AR', { maximumFractionDigits: 0 })}
               </span>
             )}
           </div>
@@ -76,7 +77,7 @@ export default function MisPagos() {
         </div>
       ))}
 
-      {mostrarAlertaCuota && (
+      {hayAlertaCuota && (
         <div style={{ marginTop: '10px', fontSize: '12px', color: '#D85A30', display: 'flex', alignItems: 'center', gap: '6px' }}>
           ⚠️ Tenés la cuota del mes sin abonar.
         </div>

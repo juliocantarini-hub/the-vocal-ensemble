@@ -39,6 +39,9 @@ export default function Inicio() {
 
   return (
     <div>
+      {/* MisPagos arriba — solo si hay alerta (después del día 15 con cuota pendiente) */}
+      <MisPagos posicion="arriba" />
+
       {/* Banner de bienvenida */}
       <div style={{
         background: 'linear-gradient(135deg, #0A4A3A 0%, #0F6E56 100%)',
@@ -70,7 +73,7 @@ export default function Inicio() {
           </div>
         )}
       </div>
-<MisPagos />
+
       {/* Stats rápidas */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px' }}>
         <StatCard val={obras.length} label="Obras en repertorio" color="#0F6E56" bg="#E1F5EE" onClick={() => navigate('/repertorio')} />
@@ -102,6 +105,11 @@ export default function Inicio() {
             <ItemBlog key={art.id} articulo={art} onClick={() => navigate(`/blog/${art.id}`)} />
           ))}
         </Seccion>
+      </div>
+
+      {/* MisPagos abajo — cuando no hay alerta */}
+      <div style={{ marginTop: '16px' }}>
+        <MisPagos posicion="abajo" />
       </div>
     </div>
   )

@@ -20,11 +20,11 @@ const NAV_ADMIN = [
   { ruta: '/admin/obras',        label: 'Obras',      icono: 'musica' },
   { ruta: '/admin/eventos',      label: 'Eventos',    icono: 'calendario' },
   { ruta: '/admin/asistencia',   label: 'Asistencia', icono: 'calendario' },
-  { ruta: '/admin/pagos',        label: 'Pagos',      icono: 'pagos' },
   { ruta: '/admin/estudio',      label: 'Estudio',    icono: 'estudio' },
   { ruta: '/admin/avisos',       label: 'Avisos',     icono: 'campana' },
   { ruta: '/admin/blog',         label: 'Textos',     icono: 'blog' },
   { ruta: '/admin/usuarios',     label: 'Cantantes',  icono: 'usuarios', presencia: true },
+  { ruta: '/admin/pagos',        label: 'Pagos',      icono: 'pagos' },
   { ruta: '/admin/asistente',    label: 'Asistente',  icono: 'asistente' },
 ]
 const ICONOS = {

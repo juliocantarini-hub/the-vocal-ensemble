@@ -1,22 +1,32 @@
 import { useState } from 'react'
 import { useColectas, useRegistrosColecta, crearColectas, eliminarColecta, marcarPago } from '../../hooks/usePagos'
 import { getCoroActual } from '../../lib/coro'
+import { supabase } from '../../lib/supabase'
 
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 const ESTADO_LABEL = { pagado: 'Pagó', pendiente: 'Pendiente', exento: 'Exento' }
 const ESTADO_COLOR = { pagado: '#0F6E56', pendiente: '#D85A30', exento: '#888780' }
 const ESTADO_BG    = { pagado: '#E1F5EE', pendiente: '#FAECE7', exento: '#F1EFE8' }
 
+function formatMonto(monto) {
+  return '$' + Number(monto).toLocaleString('es-AR', { maximumFractionDigits: 0 })
+}
+
 export default function PagosAdmin() {
   const { colectas, cargando, recargar } = useColectas()
-  const [vista, setVista] = useState('lista') // 'lista' | 'detalle' | 'nueva-cuota' | 'nueva-colecta'
+  const [vista, setVista] = useState('lista')
   const [colectaActual, setColectaActual] = useState(null)
-  const [filtro, setFiltro] = useState('todos') // 'todos' | 'cuota' | 'colecta'
+  const [filtro, setFiltro] = useState('todos')
 
   if (cargando) return <div style={{ padding: '40px', textAlign: 'center', color: '#888780' }}>Cargando...</div>
 
   if (vista === 'detalle' && colectaActual) {
-    return <DetalleColecta colecta={colectaActual} onVolver={() => { setVista('lista'); setColectaActual(null) }} />
+    return <DetalleColecta
+      colecta={colectaActual}
+      onVolver={() => { setVista('lista'); setColectaActual(null) }}
+      onEditado={(actualizada) => { setColectaActual(actualizada); recargar() }}
+      onEliminado={() => { recargar(); setVista('lista'); setColectaActual(null) }}
+    />
   }
 
   if (vista === 'nueva-cuota') {
@@ -39,7 +49,6 @@ export default function PagosAdmin() {
         </div>
       </div>
 
-      {/* Filtro */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
         {[['todos','Todos'],['cuota','Cuotas'],['colecta','Colectas']].map(([val, label]) => (
           <button key={val} onClick={() => setFiltro(val)}
@@ -64,7 +73,7 @@ export default function PagosAdmin() {
                 <div style={{ fontSize: '14px', fontWeight: '500', color: '#1A1A18' }}>{c.nombre}</div>
                 <div style={{ fontSize: '12px', color: '#888780' }}>
                   {c.tipo === 'cuota' ? `${MESES[(c.mes||1)-1]} ${c.anio}` : 'Colecta'}
-                  {c.monto ? ` · $${Number(c.monto).toLocaleString('es-AR')}` : ''}
+                  {c.monto ? ` · ${formatMonto(c.monto)}` : ''}
                 </div>
               </div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="#B4B2A9"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
@@ -76,9 +85,16 @@ export default function PagosAdmin() {
   )
 }
 
-function DetalleColecta({ colecta, onVolver }) {
+function DetalleColecta({ colecta, onVolver, onEditado, onEliminado }) {
   const { cantantes, registros, setRegistros, cargando } = useRegistrosColecta(colecta.id)
   const [guardando, setGuardando] = useState({})
+  const [editando, setEditando] = useState(false)
+  const [nombre, setNombre] = useState(colecta.nombre)
+  const [monto, setMonto] = useState(colecta.monto || '')
+  const [mes, setMes] = useState(colecta.mes || '')
+  const [anio, setAnio] = useState(colecta.anio || '')
+  const [guardandoEdicion, setGuardandoEdicion] = useState(false)
+  const [eliminando, setEliminando] = useState(false)
 
   async function handleMarcar(perfilId, estado) {
     setGuardando(g => ({ ...g, [perfilId]: true }))
@@ -90,12 +106,39 @@ function DetalleColecta({ colecta, onVolver }) {
     return registros.find(r => r.perfil_id === perfilId)?.estado || 'pendiente'
   }
 
-  function handleImprimir() {
-    const resumen = cantantes.map(c => {
-      const est = getEstado(c.id)
-      return `${c.nombre.padEnd(30)} ${ESTADO_LABEL[est]}`
-    }).join('\n')
+  async function handleGuardarEdicion() {
+    setGuardandoEdicion(true)
+    const updates = {
+      nombre: colecta.tipo === 'cuota'
+        ? `Cuota ${MESES[(Number(mes)||1)-1]} ${anio}`
+        : nombre,
+      monto: monto ? Number(monto) : null,
+    }
+    if (colecta.tipo === 'cuota') {
+      updates.mes = Number(mes)
+      updates.anio = Number(anio)
+    }
+    const { data, error } = await supabase
+      .from('colectas')
+      .update(updates)
+      .eq('id', colecta.id)
+      .select()
+      .single()
+    setGuardandoEdicion(false)
+    if (!error && data) {
+      setEditando(false)
+      onEditado(data)
+    }
+  }
 
+  async function handleEliminar() {
+    if (!confirm(`¿Eliminar "${colecta.nombre}"? Se borrarán todos los registros de pago asociados.`)) return
+    setEliminando(true)
+    await eliminarColecta(colecta.id)
+    onEliminado()
+  }
+
+  function handleImprimir() {
     const ventana = window.open('', '_blank')
     ventana.document.write(`
       <html><head><title>${colecta.nombre}</title>
@@ -111,7 +154,7 @@ function DetalleColecta({ colecta, onVolver }) {
         .exento { color: #888; }
       </style></head><body>
       <h1>${colecta.nombre}</h1>
-      <p>${colecta.monto ? `Monto: $${Number(colecta.monto).toLocaleString('es-AR')} · ` : ''}${import.meta.env.VITE_CORO_NOMBRE || ''}</p>
+      <p>${colecta.monto ? `Monto: ${formatMonto(colecta.monto)} · ` : ''}${import.meta.env.VITE_CORO_NOMBRE || ''}</p>
       <table>
         <tr><th>Cantante</th><th>Voz</th><th>Estado</th></tr>
         ${cantantes.map(c => {
@@ -126,9 +169,9 @@ function DetalleColecta({ colecta, onVolver }) {
     ventana.print()
   }
 
-  const pagados = cantantes.filter(c => getEstado(c.id) === 'pagado').length
+  const pagados   = cantantes.filter(c => getEstado(c.id) === 'pagado').length
   const pendientes = cantantes.filter(c => getEstado(c.id) === 'pendiente').length
-  const exentos = cantantes.filter(c => getEstado(c.id) === 'exento').length
+  const exentos   = cantantes.filter(c => getEstado(c.id) === 'exento').length
 
   return (
     <div>
@@ -137,14 +180,50 @@ function DetalleColecta({ colecta, onVolver }) {
           ← Volver
         </button>
         <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1A1A18', margin: 0, flex: 1 }}>{colecta.nombre}</h2>
+        <button onClick={() => setEditando(v => !v)} style={btnStyle('#888780')}>✏️ Editar</button>
         <button onClick={handleImprimir} style={btnStyle('#5F5E5A')}>🖨 Imprimir</button>
+        <button onClick={handleEliminar} disabled={eliminando} style={btnStyle('#D85A30')}>🗑 Eliminar</button>
       </div>
+
+      {/* Panel de edición */}
+      {editando && (
+        <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '18px', border: '1px solid #E8E6DF', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxWidth: '400px' }}>
+            {colecta.tipo === 'colecta' && (
+              <Campo label="Nombre">
+                <input value={nombre} onChange={e => setNombre(e.target.value)} style={inputStyle} />
+              </Campo>
+            )}
+            {colecta.tipo === 'cuota' && (
+              <>
+                <Campo label="Mes">
+                  <select value={mes} onChange={e => setMes(e.target.value)} style={inputStyle}>
+                    {MESES.map((m, i) => <option key={i} value={i+1}>{m}</option>)}
+                  </select>
+                </Campo>
+                <Campo label="Año">
+                  <input type="number" value={anio} onChange={e => setAnio(e.target.value)} style={inputStyle} />
+                </Campo>
+              </>
+            )}
+            <Campo label="Monto (sin puntos ni comas, ej: 55000)">
+              <input type="number" value={monto} onChange={e => setMonto(e.target.value)} placeholder="Ej: 55000" style={inputStyle} />
+            </Campo>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={handleGuardarEdicion} disabled={guardandoEdicion} style={btnStyle('#0F6E56')}>
+                {guardandoEdicion ? 'Guardando...' : 'Guardar'}
+              </button>
+              <button onClick={() => setEditando(false)} style={btnStyle('#888780')}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Resumen */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '20px' }}>
-        <ResCard val={pagados} label="Pagaron" color="#0F6E56" bg="#E1F5EE" />
+        <ResCard val={pagados}   label="Pagaron"    color="#0F6E56" bg="#E1F5EE" />
         <ResCard val={pendientes} label="Pendientes" color="#D85A30" bg="#FAECE7" />
-        <ResCard val={exentos} label="Exentos" color="#888780" bg="#F1EFE8" />
+        <ResCard val={exentos}   label="Exentos"    color="#888780" bg="#F1EFE8" />
       </div>
 
       {cargando ? (
@@ -243,8 +322,8 @@ function FormNuevaCuota({ onVolver, onGuardar }) {
             {MESES.map((m, i) => <option key={i} value={i+1}>{m}</option>)}
           </select>
         </Campo>
-        <Campo label="Monto (opcional)">
-          <input type="number" value={monto} onChange={e => setMonto(e.target.value)} placeholder="Ej: 5000" style={inputStyle} />
+        <Campo label="Monto (sin puntos ni comas, ej: 55000)">
+          <input type="number" value={monto} onChange={e => setMonto(e.target.value)} placeholder="Ej: 55000" style={inputStyle} />
         </Campo>
         {error && <div style={{ color: '#D85A30', fontSize: '13px' }}>{error}</div>}
         <button onClick={handleGuardar} disabled={guardando} style={btnStyle('#0F6E56', true)}>
@@ -288,7 +367,7 @@ function FormNuevaColecta({ onVolver, onGuardar }) {
         <Campo label="Nombre">
           <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Ej: Viaje de fin de año" style={inputStyle} />
         </Campo>
-        <Campo label="Monto (opcional)">
+        <Campo label="Monto (sin puntos ni comas, ej: 55000)">
           <input type="number" value={monto} onChange={e => setMonto(e.target.value)} placeholder="Ej: 2000" style={inputStyle} />
         </Campo>
         {error && <div style={{ color: '#D85A30', fontSize: '13px' }}>{error}</div>}
