@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { getCoroActual } from '../../lib/coro'
+import EncuestaDashboard from '../../components/EncuestaDashboard'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
     { label: 'Nueva obra',    sub: 'Subir partitura y audios', ruta: '/admin/obras/nueva',   color: '#0F6E56', bg: '#E1F5EE' },
     { label: 'Nuevo evento',  sub: 'Ensayo o concierto',       ruta: '/admin/eventos/nuevo', color: '#378ADD', bg: '#E6F1FB' },
     { label: 'Nuevo aviso',   sub: 'Comunicado al coro',       ruta: '/admin/avisos',        color: '#D85A30', bg: '#FAECE7' },
-    { label: 'Nuevo texto', sub: 'Publicar en Textos', ruta: '/admin/blog/nuevo', color: '#7C3AED', bg: '#F3EFF8' },,
+    { label: 'Nuevo texto',   sub: 'Publicar en Textos',       ruta: '/admin/blog/nuevo',    color: '#7C3AED', bg: '#F3EFF8' },
   ]
 
   return (
@@ -61,6 +62,9 @@ export default function AdminDashboard() {
           <StatCard val={stats.asistPendientes} label="Asistencias pend." color={stats.asistPendientes > 0 ? '#D85A30' : '#888780'} bg={stats.asistPendientes > 0 ? '#FAECE7' : '#F1EFE8'} onClick={() => navigate('/admin/eventos')} />
         </div>
       )}
+
+      {/* Encuesta activa — solo aparece si hay una encuesta abierta */}
+      <EncuestaDashboard esAdmin={true} />
 
       <div style={{ marginBottom: '24px' }}>
         <h3 style={{ fontSize: '12px', fontWeight: '600', color: '#5F5E5A', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 12px' }}>
